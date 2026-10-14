@@ -1,13 +1,38 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#10231f" />
-    <title>Melaz — Ton espace de projets</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eee9dc">
+  <meta name="description" content="Un espace personnel pour explorer mes projets, mes idées et mes expériences informatiques.">
+  <title>Des idées à façonner — Mes projets</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="projets.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+<main id="hub-galerie" aria-label="Mes projets">
+  <div class="workspace paperlight woven" data-bg="weave" data-folder="notebook" data-layout="gallery">
+    <div class="effect-layer" aria-hidden="true"><canvas class="effect-canvas"></canvas><div class="grain"></div></div>
+    <div class="content">
+      <header class="hero">
+        <div><span class="eyebrow">Idées, essais &amp; petits projets</span><h1>Des idées<br><em>à façonner.</em></h1></div>
+        <div class="knight-scene" role="img" aria-label="Petit chevalier dont le regard suit le curseur">
+          <div class="knight-volume"><img class="knight-art" src="assets/chevalier.png" alt="" width="512" height="512" draggable="false"><canvas class="knight-eyes" aria-hidden="true"></canvas></div>
+        </div>
+      </header>
+      <div class="folders" aria-label="Collection de projets"></div>
+      <noscript><p>Active JavaScript pour afficher les projets et leurs animations.</p></noscript>
+    </div>
+    <dialog class="project-dialog" aria-labelledby="project-title">
+      <button type="button" class="close-project" aria-label="Fermer">×</button>
+      <span class="dialog-kicker">À venir</span>
+      <h2 id="project-title"></h2>
+      <p>Cet emplacement accueillera un futur projet.</p>
+    </dialog>
+  </div>
+</main>
+</body>
 </html>

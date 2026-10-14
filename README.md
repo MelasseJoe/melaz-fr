@@ -1,18 +1,12 @@
-# Melaz
+# melaz-fr — Galerie aérée
 
-Hub minimaliste pour lancer les applications Melaz, avec un tracker de quetes Dofus.
+Hub personnel de projets informatiques. Site statique en HTML, CSS et JavaScript, avec carnets animés, fond discret et chevalier illustré qui suit le curseur du regard.
 
-## Developpement
+Tous les fichiers du site sont à la racine du dépôt. Aucun outil de compilation n’est nécessaire.
 
-```bash
-npm install
-npm run dev
-```
+- Ouvrir `index.html` pour prévisualiser le site.
+- Transférer les fichiers et `assets/` dans le répertoire public du serveur, en incluant `.htaccess`.
+- Modifier `projets.js` pour ajouter les noms et liens des projets.
+- Lire [la notice complète](LISEZ-MOI.md) pour la mise en ligne et la personnalisation.
 
-## Build
-
-```bash
-npm run build
-```
-
-Le contenu du dossier `dist` peut etre deploye sur un hebergement web statique comme OVH. Le fichier `dist/.htaccess` gere les URLs des pages comme `/apps/dofus-tracker`.
+Réglages retenus : contraste du fond 0,15 ; ouverture au survol 0,9.
