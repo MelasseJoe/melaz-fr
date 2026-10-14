@@ -1,13 +1,16 @@
-# Galerie aérée — Mise en ligne
+# Hub projet — Mise en ligne
 
-Le dossier contient un site statique prêt à servir. Aucun Node.js, PHP, base de données ou compilation n’est nécessaire sur le serveur.
+Le hub reste statique, sans compilation. Son premier carnet ouvre désormais Tempo, le calendrier de sport.
+Tempo nécessite PHP 8.1 minimum et une base MySQL/MariaDB pour sauvegarder les saisies entre appareils.
+Les étapes OVH Starter sont dans `projets/tempo/LISEZ-MOI.md`.
 
 ## Transférer le site
 
-1. Décompresse `galerie-aeree.zip`.
-2. Envoie **le contenu** du dossier `galerie-aeree` dans le répertoire public de ton site (souvent `public_html`, `www` ou `htdocs`) avec ton outil SFTP/FTP habituel.
-3. `index.html` doit se trouver directement dans ce répertoire. Conserve les fichiers et le dossier `assets` ensemble.
-4. Ouvre l’adresse de ton site. Tu peux aussi installer le hub dans un sous-dossier : tous les chemins sont relatifs.
+Le dossier `hub-projet` est la version à maintenir et à déployer directement. Aucune archive ZIP n’est nécessaire.
+
+1. Envoie **le contenu** du dossier `hub-projet` dans le répertoire public de ton site (souvent `public_html`, `www` ou `htdocs`) avec ton outil SFTP/FTP habituel.
+2. `index.html` doit se trouver directement dans ce répertoire. Conserve les fichiers et le dossier `assets` ensemble.
+3. Ouvre l’adresse de ton site. Tu peux aussi installer le hub dans un sous-dossier : tous les chemins sont relatifs.
 
 ## Ajouter ou modifier les projets
 
@@ -21,6 +24,7 @@ Ouvre `projets.js` avec un éditeur de texte. Chaque entrée définit un carnet 
 - `description` : texte secondaire.
 - `icon` : `sparkles`, `braces`, `orbit`, `plus`, `waves` ou `ellipsis`.
 - `url` : `null` pour un emplacement à venir ; un chemin relatif (`./projets/mon-outil/`) ou une adresse HTTPS pour ouvrir un projet dans le même onglet.
+- `cover` : `'tempo'` applique la couverture graphite et menthe avec calendrier et haltère. Sans cette propriété, le carnet classique est conservé.
 
 Tu peux ajouter ou retirer des entrées : la grille se réorganise automatiquement. Respecte les virgules entre les entrées. Aucun numéro de dossier n’est à renseigner : il est calculé automatiquement.
 
@@ -33,12 +37,16 @@ Tu peux ajouter ou retirer des entrées : la grille se réorganise automatiqueme
 
 ## Tester localement
 
-Ouvre `index.html` dans un navigateur pour une première vérification. Pour reproduire un serveur, depuis ce dossier :
+Pour vérifier le hub seul, ouvre `index.html` dans un navigateur. Pour ses ressources statiques, depuis ce dossier :
 
 ```sh
 python3 -m http.server 8000
 ```
 
 Puis ouvre `http://localhost:8000`. Pour arrêter : Ctrl+C.
+
+Ce serveur Python ne fait pas fonctionner la base de Tempo. Pour tester Tempo localement,
+utilise PHP et MySQL, importe `projets/tempo/schema.sql`, configure `projets/tempo/config.php`,
+puis lance `php -S localhost:8000 -t .` depuis ce dossier.
 
 Le site suit le thème clair/sombre du système. Il adapte la grille aux petits écrans et respecte le réglage de réduction des animations. Les carnets sont accessibles au clavier ; les emplacements à venir s’ouvrent dans une fenêtre fermable avec Échap.

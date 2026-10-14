@@ -1,0 +1,7 @@
+DirectoryIndex index.html
+Options -Indexes
+AddType application/javascript .mjs
+
+<FilesMatch "^(config(?:\.example)?\.php|schema\.sql|LISEZ-MOI\.md)$">
+    Require all denied
+</FilesMatch>

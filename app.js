@@ -11,6 +11,7 @@
  page.style.setProperty('--bg-opacity', BACKGROUND_OPACITY);
  page.style.setProperty('--opening', OPENING);
  const paths = {
+  dumbbell: '<path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829Z"/><path d="m2.5 21.5 1.4-1.4m16.2-16.2 1.4-1.4M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829Zm4.257-7.085 4.8-4.8"/>',
   sparkles: '<path d="m12 3 2.8 6.2L21 12l-6.2 2.8L12 21l-2.8-6.2L3 12l6.2-2.8Z"/><path d="M20 2v4M18 4h4"/>',
   braces: '<path d="M8 3H6a2 2 0 0 0-2 2v4a3 3 0 0 1-2 3 3 3 0 0 1 2 3v4a2 2 0 0 0 2 2h2M16 3h2a2 2 0 0 1 2 2v4a3 3 0 0 0 2 3 3 3 0 0 0-2 3v4a2 2 0 0 1-2 2h-2"/>',
   orbit: '<circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="5" transform="rotate(-35 12 12)"/>',
@@ -30,12 +31,19 @@
   const url = validURL(project.url);
   const item = document.createElement(url ? 'a' : 'button');
   if (url) item.href = url; else item.type = 'button';
-  item.className = 'project';
+  const tempoCover = project.cover === 'tempo';
+  item.className = 'project' + (tempoCover ? ' tempo-project' : '');
   item.setAttribute('aria-label', (url ? 'Ouvrir ' : 'Découvrir ') + project.title);
   const preview = document.createElement('span');
   preview.className = 'folder-preview';
   preview.setAttribute('aria-hidden', 'true');
-  preview.innerHTML = '<span class="folder-shadow"></span><span class="folder-object" style="--angle:' + [-5,5,-3,3,-7,2][i % 6] + 'deg"><span class="book-back"></span><span class="book-pages"></span><span class="book-page"></span><span class="book-ribbon"></span><span class="book-cover"><span class="book-cover-edge"></span><span class="book-cover-bottom"></span><span class="object-icon">' + icon(project.icon) + '</span><span class="object-number">' + String(i+1).padStart(2,'0') + '</span></span></span>';
+  const calendar = tempoCover ? '<span class="tempo-cover-calendar">' + Array.from({ length: 77 }, (_, cell) => {
+   const row = Math.floor(cell / 11), column = cell % 11;
+   return '<i class="' + ([0,2,4].includes(row) && (column + row) % 5 !== 0 ? 'sport' : 'pause') + '"></i>';
+  }).join('') + '</span>' : '';
+  const innerPage = tempoCover ? '<span class="tempo-page-calendar">' + Array.from({ length: 42 }, (_, cell) => '<i class="' + ([0,2,4].includes(cell % 7) ? 'sport' : '') + '"></i>').join('') + '</span>' : '';
+  const coverArt = tempoCover ? calendar + '<span class="tempo-haltere">' + icon('dumbbell') + '</span>' : '<span class="object-icon">' + icon(project.icon) + '</span><span class="object-number">' + String(i+1).padStart(2,'0') + '</span>';
+  preview.innerHTML = '<span class="folder-shadow"></span><span class="folder-object" style="--angle:' + [-5,5,-3,3,-7,2][i % 6] + 'deg"><span class="book-back"></span><span class="book-pages"></span><span class="book-page">' + innerPage + '</span><span class="book-ribbon"></span><span class="book-cover"><span class="book-cover-edge"></span><span class="book-cover-bottom"></span>' + coverArt + '</span></span>';
   const caption = document.createElement('span');
   caption.className = 'folder-caption';
   const label = document.createElement('span');

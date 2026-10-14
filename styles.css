@@ -312,3 +312,18 @@ body {margin:0;}
 #hub-galerie .project-dialog p {font-size:14px;line-height:1.8;margin:0;color:var(--muted-ink);}
 #hub-galerie .dialog-kicker {font:11px 'Space Grotesk',sans-serif;letter-spacing:2px;text-transform:uppercase;color:var(--muted-ink);}
 @media(prefers-reduced-motion:reduce){#hub-galerie .folder-object {transform:rotateX(-13deg) rotateY(-23deg) rotateZ(var(--angle));}#hub-galerie .project:hover .folder-object,#hub-galerie .project:focus-visible .folder-object {transform:rotateX(-13deg) rotateY(-23deg) rotateZ(var(--angle));}}
+
+/* Carnet Tempo : graphite et menthe, calendrier gravé et haltère. */
+#hub-galerie .tempo-project {--folder-edge:#101815;--folder-back:#101714;--folder-front:#19221f;--folder-light:#27332e;--sheet:#f5f0e4;--rule:#c9c3b5;--tempo-mint:#8de0bb;}
+#hub-galerie .tempo-project .book-cover {box-shadow:inset 0 1px 0 #ffffff20,2px 0 0 var(--folder-edge),0 2px 0 var(--folder-edge);}
+#hub-galerie .tempo-project .book-cover::before {background:#0005;box-shadow:2px 0 0 #ffffff0b;}
+#hub-galerie .tempo-project .book-ribbon {background:var(--tempo-mint);}
+#hub-galerie .tempo-cover-calendar {position:absolute;inset:30% 14% auto 20%;display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:1.5px;}
+#hub-galerie .tempo-cover-calendar i {display:block;aspect-ratio:1;border-radius:1px;background:#42614f;opacity:.45;}
+#hub-galerie .tempo-cover-calendar i.sport {background:var(--tempo-mint);opacity:1;}
+#hub-galerie .tempo-haltere {position:absolute;left:50%;bottom:8%;transform:translateX(-50%);display:grid;place-items:center;width:28%;aspect-ratio:1;color:#719782;filter:drop-shadow(1px 1px 0 #0009);}
+#hub-galerie .tempo-haltere svg {width:100%;height:100%;stroke-width:1.4;}
+#hub-galerie .tempo-project .book-page::after {display:none;}
+#hub-galerie .tempo-page-calendar {position:absolute;inset:27% 14% auto 18%;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;}
+#hub-galerie .tempo-page-calendar i {display:block;aspect-ratio:1;background:#d4dfd4;border-radius:1px;}
+#hub-galerie .tempo-page-calendar i.sport {background:#5f9678;}

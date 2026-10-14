@@ -1,0 +1,342 @@
+html {color-scheme:dark;background:#171d1c;} body {margin:0;}
+
+#tempo-app .fit {--bg:light-dark(#f8faf9,#101513);--panel:light-dark(#ffffff,#19201d);--ink:light-dark(#18221d,#eaf2ec);--muted:light-dark(#68736c,#a6b3aa);--line:light-dark(#dce4de,#344038);--empty:light-dark(#e7eee9,#27382d);--active:light-dark(#168347,#6fc992);--accent:var(--active);--accent-ink:light-dark(#fff,#101513);--font:'DM Sans',sans-serif;box-sizing:border-box;min-height:1050px;position:relative;isolation:isolate;background:var(--bg);color:var(--ink);padding:32px 44px 58px;font:14px/1.5 var(--font);overflow:hidden;color-scheme:light dark;}
+#tempo-app .fit * {box-sizing:border-box;}
+#tempo-app .fit [hidden] {display:none!important;}
+#tempo-app .fit button,#tempo-app .fit input {font:inherit;}
+#tempo-app .fit input {color:inherit;}
+#tempo-app .fit button {border:0;}
+#tempo-app .top {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-right:70px;min-height:40px;}
+#tempo-app .wordmark {display:flex;align-items:center;gap:9px;font:700 19px 'Space Grotesk',sans-serif;letter-spacing:-.6px;}
+#tempo-app .wordmark svg {width:20px;height:20px;color:var(--accent);}
+#tempo-app .demo {font:11px 'Space Grotesk',sans-serif;color:var(--muted);letter-spacing:.5px;}
+#tempo-app .intro {margin:48px 0 28px;display:flex;justify-content:space-between;align-items:end;gap:24px;}
+#tempo-app .kicker {font:500 11px 'Space Grotesk',sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:1.6px;}
+#tempo-app h1 {font:600 clamp(38px,5.7vw,62px)/1.04 'Space Grotesk',sans-serif;letter-spacing:-2.7px;margin:13px 0 15px;max-width:630px;}
+#tempo-app .subtitle {margin:0;color:var(--muted);font-size:13px;max-width:410px;}
+#tempo-app .add-session {display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;white-space:nowrap;padding:12px 18px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-weight:600;}
+#tempo-app .add-session svg {width:15px;height:15px;}
+#tempo-app .summary {display:flex;gap:40px;align-items:center;margin:38px 0;}
+#tempo-app .metric {min-width:0;}
+#tempo-app .metric b {display:block;font:500 40px/1.1 'Space Grotesk',sans-serif;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;}
+#tempo-app .metric span {display:block;margin-top:9px;color:var(--muted);font-size:12px;}
+#tempo-app .metric:first-child b {color:var(--active);}
+#tempo-app .year-panel {position:relative;padding:27px 26px 23px;background:var(--panel);border:1px solid var(--line);border-radius:17px;}
+#tempo-app .section-head {display:flex;justify-content:space-between;align-items:baseline;gap:15px;margin-bottom:26px;}
+#tempo-app h2 {font:600 14px 'Space Grotesk',sans-serif;letter-spacing:-.2px;margin:0;}
+#tempo-app .year-label {font:12px 'Space Grotesk',sans-serif;color:var(--muted);}
+#tempo-app .heatmap {width:100%;display:block;touch-action:pan-y;}
+#tempo-app .legend {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px;margin-top:20px;color:var(--muted);font-size:11px;}
+#tempo-app .legend-items {display:flex;gap:15px;align-items:center;}
+#tempo-app .legend-items span {display:flex;align-items:center;gap:6px;}
+#tempo-app .swatch {width:10px;height:10px;border-radius:3px;background:var(--empty);}
+#tempo-app .swatch.active {background:var(--active);}
+#tempo-app .month-panel {margin-top:36px;}
+#tempo-app .months {display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:15px;margin-top:26px;}
+#tempo-app .month {min-width:0;}
+#tempo-app .month-count {display:block;font:500 13px 'Space Grotesk',sans-serif;color:var(--ink);margin-bottom:8px;}
+#tempo-app .month-bar-track {height:94px;display:flex;align-items:end;}
+#tempo-app .month-bar {width:100%;background:var(--active);border-radius:3px 3px 0 0;min-height:2px;opacity:.8;transition:height .2s;}
+#tempo-app .month-name {display:block;font:11px 'Space Grotesk',sans-serif;color:var(--muted);margin-top:10px;}
+#tempo-app .foot {display:flex;justify-content:space-between;gap:15px;align-items:center;margin-top:32px;border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font:11px 'Space Grotesk',sans-serif;}
+#tempo-app .message {font-size:11px;color:var(--active);min-height:17px;}
+#tempo-app .ring-layout {display:grid;grid-template-columns:240px minmax(0,1fr);gap:30px;align-items:center;margin:33px 0 38px;}
+#tempo-app .ring {height:215px;position:relative;display:grid;place-items:center;}
+#tempo-app .ring svg {height:100%;width:100%;overflow:visible;}
+#tempo-app .ring-track {stroke:var(--empty);}
+#tempo-app .ring-progress {stroke:var(--active);transition:stroke-dasharray .25s;}
+#tempo-app .ring-centre {position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+#tempo-app .ring-centre b {font:500 56px/1 'Space Grotesk';letter-spacing:-2px;}
+#tempo-app .ring-centre span {font-size:11px;color:var(--muted);margin-top:8px;}
+#tempo-app .ring-layout .summary {flex-wrap:wrap;margin:0;gap:25px 40px;}
+#tempo-app .weekly-panel {margin:30px 0 34px;}
+#tempo-app .weekly-bars {display:flex;align-items:end;gap:13px;height:165px;margin-top:25px;}
+#tempo-app .week-column {flex:1;min-width:0;}
+#tempo-app .week-column b {display:block;font:12px 'Space Grotesk';color:var(--muted);margin-bottom:8px;}
+#tempo-app .week-column i {display:block;background:var(--active);height:var(--bar-height);border-radius:6px 6px 0 0;opacity:.9;}
+#tempo-app .week-labels {display:flex;justify-content:space-between;font:11px 'Space Grotesk';color:var(--muted);margin-top:13px;}
+#tempo-app .week-days {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:13px;margin:34px 0;}
+#tempo-app .week-day {padding:20px 5px;border-radius:24px;background:var(--panel);color:var(--ink);border:1px solid var(--line)!important;text-align:center;min-height:118px;}
+#tempo-app .week-day .weekday {display:block;font-size:11px;color:var(--muted);}
+#tempo-app .week-day b {display:block;font:500 26px 'Space Grotesk';margin:8px 0;}
+#tempo-app .week-day .day-status {display:block;font-size:11px;color:var(--muted);}
+#tempo-app .week-day.is-active {background:var(--active);color:var(--accent-ink);border-color:transparent!important;}
+#tempo-app .week-day.is-active span {color:inherit;}
+#tempo-app .split-content {display:grid;grid-template-columns:180px minmax(0,1fr);gap:32px;margin-top:40px;}
+#tempo-app .split-content .summary {display:flex;align-items:start;flex-direction:column;margin:0;gap:35px;}
+#tempo-app .split-content .year-panel {min-width:0;}
+#tempo-app .large-number {font:500 clamp(92px,15vw,160px)/.9 'Space Grotesk',sans-serif;letter-spacing:-9px;font-variant-numeric:tabular-nums;margin:32px 0 7px;}
+#tempo-app .large-label {font-size:13px;color:var(--muted);}
+#tempo-app .poster-number {display:flex;align-items:center;justify-content:space-between;gap:30px;margin-bottom:33px;}
+#tempo-app .poster-number .summary {margin:0;}
+#tempo-app .poster-number .summary .metric:first-child {display:none;}
+#tempo-app .week-day:disabled {opacity:.4;}
+#tempo-app .editor {position:absolute;z-index:10;inset:100px max(20px,calc((100% - 390px)/2)) auto;max-width:390px;padding:30px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 100px #0004;}
+#tempo-app .editor h2 {font-size:23px;letter-spacing:-.6px;margin:0 30px 24px 0;}
+#tempo-app .editor label.date {display:block;font-size:12px;color:var(--muted);}
+#tempo-app .editor input[type=date] {display:block;width:100%;height:46px;background:var(--bg);border:1px solid var(--line);border-radius:8px;margin:9px 0 22px;padding:10px;font-size:16px;}
+#tempo-app .editor .check {display:flex;align-items:center;gap:10px;min-height:44px;font-size:13px;}
+#tempo-app .editor input[type=checkbox] {width:18px;height:18px;accent-color:var(--active);}
+#tempo-app .editor .save {width:100%;margin-top:20px;}
+#tempo-app .editor .close {position:absolute;right:14px;top:14px;width:44px;height:44px;background:transparent;color:var(--muted);display:grid;place-items:center;}
+#tempo-app .editor .close svg {width:20px;height:20px;}
+#tempo-app .editor .form-note {font-size:11px;color:var(--muted);margin:17px 0 0;}
+#tempo-app .probe {position:absolute;width:0;height:0;pointer-events:none;}
+/* Signal: crisp white, green highlight, the calendar as the central object. */
+#tempo-app .signal {--bg:#f7f9f8;--panel:#fff;--ink:#18221d;--muted:#65716a;--line:#e0e7e2;--empty:#e9efeb;--active:#208956;--accent:#1d784a;--accent-ink:#fff;color-scheme:light;}
+#tempo-app .signal .summary {justify-content:space-between;padding:27px 0 25px;border-top:1px solid var(--line);}
+#tempo-app .signal .metric:first-child b {font-size:62px;letter-spacing:-3px;}
+/* Obsidienne: a quiet performance console around a luminous annual dial. */
+#tempo-app .obsidian {--bg:#111315;--panel:#171a1c;--ink:#f3f6f5;--muted:#9da7a3;--line:#303633;--empty:#303734;--active:#adf3be;--accent:#adf3be;--accent-ink:#112018;color-scheme:dark;}
+#tempo-app .obsidian .intro {margin-bottom:0;}
+#tempo-app .obsidian h1 {font-size:48px;}
+#tempo-app .obsidian .year-panel {background:transparent;border-radius:0;padding:25px 0;border-left:0;border-right:0;}
+#tempo-app .obsidian .ring-layout {grid-template-columns:285px minmax(0,1fr);margin:15px 0 30px;}
+#tempo-app .obsidian .ring {height:255px;}
+#tempo-app .obsidian .metric b {font-size:46px;}
+/* Sprint: editorial sports typography, blue band, count as a poster. */
+#tempo-app .sprint {--bg:#f1f0ed;--panel:#f1f0ed;--ink:#151719;--muted:#61666b;--line:#c9cbce;--empty:#d5d7df;--active:#2444e7;--accent:#2444e7;--accent-ink:#fff;color-scheme:light;}
+#tempo-app .sprint h1 {font:700 90px/.95 'Barlow Condensed';text-transform:uppercase;letter-spacing:-2px;max-width:460px;}
+#tempo-app .sprint .large-number {font:600 166px/.85 'Barlow Condensed';letter-spacing:-5px;color:var(--active);}
+#tempo-app .sprint .year-panel {border:0;border-top:2px solid var(--ink);border-radius:0;padding:27px 0;}
+#tempo-app .sprint .add-session {border-radius:0;text-transform:uppercase;font:600 14px 'Barlow Condensed';letter-spacing:1px;}
+#tempo-app .sprint .metric b {font-family:'Barlow Condensed';font-size:48px;}
+#tempo-app .sprint .month-bar {border-radius:0;}
+/* Halo: a centered violet composition, one number and its orbital indicator. */
+#tempo-app .halo {--bg:#f6f4ff;--panel:#fff;--ink:#25213f;--muted:#77718d;--line:#e2ddef;--empty:#ebe7f5;--active:#7e61cf;--accent:#7350c4;--accent-ink:#fff;color-scheme:light;}
+#tempo-app .halo .intro {display:block;text-align:center;margin-top:37px;}
+#tempo-app .halo h1 {margin:15px auto 12px;font-size:50px;max-width:550px;}
+#tempo-app .halo .subtitle {margin:0 auto;}
+#tempo-app .halo .intro .add-session {margin:20px auto 0;border-radius:30px;}
+#tempo-app .halo .ring-layout {grid-template-columns:1fr;gap:8px;margin:20px 0 33px;}
+#tempo-app .halo .ring {height:170px;}
+#tempo-app .halo .ring-centre b {font-size:46px;}
+#tempo-app .halo .summary {justify-content:center;gap:65px;}
+#tempo-app .halo .metric b {font-size:27px;text-align:center;}
+#tempo-app .halo .year-panel {border:0;border-radius:23px;box-shadow:0 12px 40px #3f28710a;}
+#tempo-app .halo .month-panel {margin-top:28px;}
+/* Bloc: numbered, uncompromising, warm orange and an asymmetric data area. */
+#tempo-app .bloc {--bg:#fffdf8;--panel:#fffdf8;--ink:#251d17;--muted:#786d63;--line:#ddd3c7;--empty:#ece5da;--active:#ed6531;--accent:#ed6531;--accent-ink:#fff;color-scheme:light;--font:'Space Grotesk',sans-serif;}
+#tempo-app .bloc .top {border-bottom:2px solid var(--ink);padding-bottom:18px;}
+#tempo-app .bloc h1 {font-size:57px;letter-spacing:-3px;}
+#tempo-app .bloc .add-session {border-radius:0;}
+#tempo-app .bloc .split-content .metric:first-child b {font-size:77px;letter-spacing:-5px;}
+#tempo-app .bloc .year-panel {border-radius:0;border:0;background:#f4ede4;padding:24px;}
+#tempo-app .bloc .month-panel {padding-top:25px;border-top:2px solid var(--ink);}
+/* Pause: maximum whitespace and soft sage, almost no containers. */
+#tempo-app .pause {--bg:#eef3ef;--panel:#eef3ef;--ink:#32483d;--muted:#708377;--line:#cfdbd2;--empty:#dce6dd;--active:#6a977d;--accent:#486f56;--accent-ink:#fff;color-scheme:light;padding-top:40px;}
+#tempo-app .pause .intro {margin-top:73px;display:block;}
+#tempo-app .pause h1 {font-weight:400;font-size:57px;letter-spacing:-2.8px;max-width:600px;}
+#tempo-app .pause .intro .add-session {margin-top:25px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:30px;}
+#tempo-app .pause .summary {margin:48px 0 53px;gap:70px;}
+#tempo-app .pause .metric b {font-weight:400;font-size:36px;}
+#tempo-app .pause .year-panel {border:0;border-radius:0;padding:0;}
+#tempo-app .pause .month-bar {border-radius:12px 12px 0 0;max-width:16px;}
+#tempo-app .pause .months {gap:18px;}
+/* Aurora: indigo night, lavender columns and a subdued light behind the data. */
+#tempo-app .aurora {--bg:#151522;--panel:#1e1e30;--ink:#ecebfa;--muted:#aaa8c8;--line:#39364e;--empty:#353247;--active:#bb9def;--accent:#bea4ef;--accent-ink:#21172f;color-scheme:dark;background:radial-gradient(ellipse at 90% 10%,#58436c33,transparent 50%),var(--bg);}
+#tempo-app .aurora h1 {font-size:52px;font-weight:500;}
+#tempo-app .aurora .summary {margin:30px 0;gap:60px;}
+#tempo-app .aurora .weekly-panel {padding:22px 25px 18px;background:linear-gradient(125deg,#28223a,#1c1c2a);border-radius:20px;}
+#tempo-app .aurora .weekly-bars {height:115px;}
+#tempo-app .aurora .year-panel {border:1px solid #39364e;background:#1b1b2a;border-radius:20px;}
+#tempo-app .aurora .month-panel {display:none;}
+/* Tempo: tactile week pills above a spare yearly strip. */
+#tempo-app .tempo {--bg:#faf9f7;--panel:#fff;--ink:#1d282b;--muted:#738087;--line:#dee3e4;--empty:#e8edef;--active:#176979;--accent:#176979;--accent-ink:#fff;color-scheme:light;}
+#tempo-app .tempo .intro {margin-top:42px;}
+#tempo-app .tempo h1 {font-size:52px;max-width:470px;}
+#tempo-app .tempo .summary {justify-content:space-between;margin:24px 0 35px;padding-bottom:26px;border-bottom:1px solid var(--line);}
+#tempo-app .tempo .metric b {font-size:34px;}
+#tempo-app .tempo .year-panel {padding:25px 0;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;}
+#tempo-app .tempo .month-panel {margin-top:18px;}
+#tempo-app .tempo .month-bar-track {height:62px;}
+/* Swiss: red editorial geometry, gigantic annual count and disciplined rules. */
+#tempo-app .swiss {--bg:#f6f6f3;--panel:#f6f6f3;--ink:#111516;--muted:#626768;--line:#c7cccd;--empty:#e1e3e2;--active:#c52e2e;--accent:#c52e2e;--accent-ink:#fff;color-scheme:light;}
+#tempo-app .swiss .intro {border-bottom:1px solid var(--ink);padding-bottom:28px;margin-bottom:24px;}
+#tempo-app .swiss h1 {font-size:48px;letter-spacing:-2.5px;}
+#tempo-app .swiss .large-number {color:var(--active);font-size:148px;margin-top:12px;}
+#tempo-app .swiss .year-panel {padding:30px 0;border:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);border-radius:0;}
+#tempo-app .swiss .add-session {border-radius:2px;}
+#tempo-app .swiss .month-bar {border-radius:0;}
+#tempo-app .swiss .metric b {font-size:32px;}
+/* Atlas: technical grid, slate green, compact side index and precision spacing. */
+#tempo-app .atlas {--bg:#14201e;--panel:#1a2825;--ink:#dcece5;--muted:#91a99e;--line:#334c42;--empty:#2a3d35;--active:#71c9a3;--accent:#75d5ac;--accent-ink:#14201e;--font:'Space Grotesk',sans-serif;color-scheme:dark;padding-left:120px;}
+#tempo-app .atlas .rail {position:absolute;left:0;top:0;bottom:0;width:82px;border-right:1px solid var(--line);display:flex;align-items:center;flex-direction:column;gap:24px;padding-top:39px;color:var(--muted);}
+#tempo-app .atlas .rail svg {width:19px;height:19px;}
+#tempo-app .atlas .rail .rail-active {color:var(--active);padding:13px;border:1px solid var(--line);border-radius:10px;}
+#tempo-app .atlas .rail small {writing-mode:vertical-rl;letter-spacing:3px;font-size:11px;margin-top:100px;}
+#tempo-app .atlas .intro {margin-top:43px;}
+#tempo-app .atlas h1 {font-size:48px;letter-spacing:-2px;}
+#tempo-app .atlas .summary {gap:0;border:1px solid var(--line);border-radius:3px;margin:36px 0;}
+#tempo-app .atlas .metric {flex:1;padding:22px;}
+#tempo-app .atlas .metric+.metric {border-left:1px solid var(--line);}
+#tempo-app .atlas .metric b {font-size:34px;}
+#tempo-app .atlas .year-panel {border-radius:3px;padding:25px 21px;}
+#tempo-app .atlas .add-session {border-radius:3px;}
+#tempo-app .atlas .months {gap:9px;}
+#tempo-app .atlas .month-bar {border-radius:0;}
+@media(max-width:800px){
+ #tempo-app .fit {padding:29px 28px 50px;}
+ #tempo-app .atlas {padding-left:104px;}
+ #tempo-app .intro {gap:20px;}
+ #tempo-app .summary {gap:30px;}
+ #tempo-app .poster-number .summary {gap:28px;}
+ #tempo-app .months {gap:10px;}
+ #tempo-app .split-content {grid-template-columns:150px minmax(0,1fr);gap:24px;}
+ #tempo-app .sprint h1 {font-size:76px;}
+}
+@media(max-width:650px){
+ #tempo-app .fit {padding:23px 20px 38px;min-height:1550px;}
+ #tempo-app .top {margin-right:45px;align-items:start;flex-direction:column;gap:5px;}
+ #tempo-app .intro {display:block!important;margin-top:35px!important;}
+ #tempo-app h1,#tempo-app .obsidian h1,#tempo-app .halo h1,#tempo-app .bloc h1,#tempo-app .pause h1,#tempo-app .aurora h1,#tempo-app .tempo h1,#tempo-app .swiss h1,#tempo-app .atlas h1 {font-size:39px;letter-spacing:-1.7px;}
+ #tempo-app .sprint h1 {font-size:64px;}
+ #tempo-app .intro .add-session {margin-top:24px;}
+ #tempo-app .summary,#tempo-app .signal .summary,#tempo-app .pause .summary,#tempo-app .aurora .summary {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:29px 0;}
+ #tempo-app .metric b,#tempo-app .metric:first-child b,#tempo-app .signal .metric:first-child b,#tempo-app .obsidian .metric b,#tempo-app .tempo .metric b,#tempo-app .atlas .metric b {font-size:30px;letter-spacing:-1px;}
+ #tempo-app .metric span {font-size:11px;line-height:1.6;}
+ #tempo-app .ring-layout,#tempo-app .obsidian .ring-layout {grid-template-columns:1fr;gap:0;}
+ #tempo-app .ring {height:185px;}
+ #tempo-app .ring-layout .summary {display:grid;margin:20px 0 15px;}
+ #tempo-app .year-panel,#tempo-app .bloc .year-panel,#tempo-app .atlas .year-panel {padding:20px 13px;}
+ #tempo-app .months {grid-template-columns:repeat(6,minmax(0,1fr));gap:20px 15px;}
+ #tempo-app .month-bar-track {height:72px;}
+ #tempo-app .split-content {display:block;}
+ #tempo-app .split-content .summary {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:28px;gap:14px;}
+ #tempo-app .bloc .split-content .metric:first-child b {font-size:36px;letter-spacing:-1px;}
+ #tempo-app .poster-number {display:block;}
+ #tempo-app .poster-number .summary {margin-top:22px;}
+ #tempo-app .poster-number .summary {grid-template-columns:repeat(2,minmax(0,1fr));}
+ #tempo-app .large-number,#tempo-app .swiss .large-number {font-size:120px;letter-spacing:-6px;}
+ #tempo-app .sprint .large-number {font-size:142px;}
+ #tempo-app .week-days {gap:6px;}
+ #tempo-app .week-day {border-radius:17px;padding:14px 2px;min-height:102px;}
+ #tempo-app .week-day b {font-size:20px;}
+ #tempo-app .week-day .day-status {display:none;}
+ #tempo-app .halo .summary {gap:15px;}
+ #tempo-app .atlas .rail {display:none;}
+ #tempo-app .atlas .metric {padding:12px 9px;}
+ #tempo-app .atlas .summary {gap:0;}
+ #tempo-app .foot {align-items:start;flex-direction:column;gap:7px;}
+ #tempo-app .editor {inset:90px 15px auto;max-width:none;padding:25px;}
+}
+@media(max-width:380px){#tempo-app .sprint h1 {font-size:50px;letter-spacing:-1px;}}
+@media(prefers-reduced-motion:reduce){#tempo-app .month-bar,#tempo-app .ring-progress {transition:none;}}
+#tempo-app .month-start-key {display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;font:500 11px 'Space Grotesk',sans-serif;color:var(--ink);font-style:normal;}
+
+#tempo-app .month-start-key {width:10px;height:10px;position:relative;background:var(--empty);border-radius:2px;}
+#tempo-app [data-marker=notch] .month-start-key {clip-path:polygon(0 0,60% 0,100% 40%,100% 100%,0 100%);background:var(--muted);}
+#tempo-app [data-marker=pearl] .month-start-key::after {content:'';position:absolute;width:4px;height:4px;background:var(--ink);border-radius:50%;left:3px;top:3px;}
+#tempo-app [data-marker=seam] .month-start-key {background:transparent;border-left:1px solid var(--muted);border-top:1px solid var(--muted);width:6px;height:10px;}
+#tempo-app [data-marker=beacon] .month-start-key {background:transparent;border-left:1px solid var(--muted);border-bottom:1px solid var(--muted);width:6px;}
+#tempo-app [data-marker=space] .month-start-key {background:linear-gradient(to right,var(--muted) 0 3px,transparent 3px 7px,var(--muted) 7px 10px);height:7px;}
+
+#tempo-app .insights {margin-top:30px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;min-height:660px;align-content:start;}
+#tempo-app .insight {min-width:0;border-top:1px solid var(--line);padding-top:24px;}
+#tempo-app .insight-title {font:500 15px 'Space Grotesk',sans-serif;display:block;margin-bottom:17px;}
+#tempo-app .insight-value {font:500 46px/1.15 'Space Grotesk',sans-serif;letter-spacing:-1.8px;font-variant-numeric:tabular-nums;}
+#tempo-app .insight-value small {font:12px 'DM Sans',sans-serif;letter-spacing:0;color:var(--muted);margin-left:7px;}
+#tempo-app .insight-detail {font-size:12px;color:var(--muted);margin:10px 0 24px;min-height:38px;line-height:1.6;}
+#tempo-app .insight-canvas {display:block;width:100%;height:160px;}
+#tempo-app .insight-caption {font-size:11px;color:var(--muted);margin-top:15px;line-height:1.6;min-height:36px;}
+#tempo-app [data-insight="1"] .insights {grid-template-columns:1fr;gap:0;}
+#tempo-app [data-insight="1"] .insight {display:grid;grid-template-columns:210px minmax(0,1fr);gap:36px;padding:25px 0;align-items:center;}
+#tempo-app [data-insight="1"] .insight-title {margin-bottom:12px;}
+#tempo-app [data-insight="1"] .insight-detail {margin-bottom:0;}
+#tempo-app [data-insight="1"] .insight-canvas {height:125px;}
+#tempo-app [data-insight="1"] .insight-caption {margin-top:6px;min-height:20px;}
+#tempo-app [data-insight="2"] .insights {gap:16px;}
+#tempo-app [data-insight="2"] .insight {background:var(--panel);border:0;border-radius:24px;padding:25px 22px;}
+#tempo-app [data-insight="2"] .insight-canvas {height:195px;}
+#tempo-app [data-insight="2"] .insight-value {font-size:40px;}
+#tempo-app .tempo .year-panel {border-top:0;padding-top:15px;}
+@media(max-width:760px){
+ #tempo-app .insights {grid-template-columns:1fr;min-height:1180px;gap:26px;}
+ #tempo-app .insight {padding-top:23px;}
+ #tempo-app .insight-copy {display:grid;grid-template-columns:1fr auto;gap:6px 20px;align-items:center;}
+ #tempo-app .insight-title {margin:0;}
+ #tempo-app .insight-value {font-size:38px;}
+ #tempo-app .insight-detail {grid-column:1/-1;min-height:0;margin:4px 0 18px;}
+ #tempo-app [data-insight="1"] .insight {grid-template-columns:1fr;gap:14px;}
+ #tempo-app [data-insight="1"] .insight-title {margin:0;}
+ #tempo-app [data-insight="1"] .insight-canvas {height:160px;}
+ #tempo-app [data-insight="2"] .insight-canvas {height:195px;}
+}
+
+
+#tempo-app .thread .insight-value {letter-spacing:0;}
+#tempo-app .thread .series-label {display:block;font:500 11px 'DM Sans',sans-serif;color:var(--muted);margin:0 0 12px;letter-spacing:0;}
+#tempo-app .thread .series-numbers {display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+#tempo-app .thread .series-numbers b {display:block;font:500 34px/1.1 'Space Grotesk',sans-serif;color:var(--ink);letter-spacing:-1px;}
+#tempo-app .thread .series-numbers span span,#tempo-app .thread .series-numbers div span {display:block;font:11px 'DM Sans',sans-serif;color:var(--muted);margin-top:7px;letter-spacing:0;}
+#tempo-app .thread .insight-detail {border-top:1px solid var(--line);padding-top:19px;margin-top:20px;margin-bottom:0;}
+#tempo-app .thread .insight-detail .series-numbers b {font-size:24px;}
+#tempo-app .thread .series-dates {display:block;font-size:11px;margin-top:14px;color:var(--muted);}
+#tempo-app .thread .insight-canvas {height:165px;}
+#tempo-app .insights {min-height:0;}
+@media(max-width:760px){#tempo-app .thread .insight-copy {display:block;}#tempo-app .thread .insight-title {margin-bottom:22px;}#tempo-app .insights {min-height:0;}}
+
+#tempo-app .insights {grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;}
+@media(max-width:760px){#tempo-app .insights {grid-template-columns:1fr;}}
+
+#tempo-app .top {justify-content:flex-end;min-height:20px;}
+#tempo-app .intro {margin-top:28px;margin-bottom:26px;}
+#tempo-app .tempo .year-panel {padding-bottom:10px;}
+#tempo-app .pulse .insight-caption {display:none;}
+#tempo-app .message {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+#tempo-app .insights {margin-top:24px;}
+
+
+#tempo-app .fit {max-width:1280px;margin:auto;min-height:0;}
+#tempo-app .top {display:none;}
+#tempo-app .intro {margin-top:10px;}
+#tempo-app button:not(:disabled),#tempo-app .heatmap {cursor:pointer;}
+#tempo-app button:disabled {cursor:default;}
+#tempo-app .sync-status {display:flex;align-items:center;justify-content:space-between;gap:16px;color:var(--ink);font-size:13px;padding:16px 0;margin-bottom:10px;}
+#tempo-app .sync-status[hidden] {display:none;}
+#tempo-app .sync-status button {color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;}
+#tempo-app .form-note.error {color:#f5b3a4;}
+#tempo-app .editor {position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:min(390px,calc(100% - 30px));}
+#tempo-app .editor .close {font-size:24px;}
+#tempo-app .editor .save:disabled {opacity:.65;}
+#tempo-app .editor label.check {cursor:pointer;}
+#tempo-app .intro .add-session span {font-size:19px;line-height:1;}
+#tempo-app .insights {margin-top:24px;}
+#tempo-app .insight-copy {min-height:240px;}
+#tempo-app .pulse .insight-visual {padding-top:8px;}
+#tempo-app .thread .insight-caption {min-height:18px;}
+@media(max-width:650px){#tempo-app .fit {min-height:0;}#tempo-app .editor {padding:25px;}}
+
+#tempo-app .hub-return {display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 10px;margin-left:-10px;color:var(--muted);text-decoration:none;font-size:12px;border-radius:8px;}
+#tempo-app .hub-return span {font-size:18px;line-height:1;}
+#tempo-app .hub-return:hover {color:var(--ink);background:var(--panel);}
+#tempo-app .pulse {display:flex;flex-direction:column;}
+#tempo-app .pulse .insight-copy {min-height:0;}
+#tempo-app .pulse .insight-visual {flex:1;display:grid;place-items:center;min-height:340px;padding:0;}
+#tempo-app .pulse .insight-canvas {width:100%;max-width:380px;height:340px;}
+@media(max-width:760px){#tempo-app .pulse .insight-visual {min-height:280px;}#tempo-app .pulse .insight-canvas {height:280px;}}
+#tempo-app .pulse {position:relative;min-height:480px;}
+#tempo-app .pulse .insight-copy {position:relative;z-index:1;}
+#tempo-app .pulse .insight-visual {position:absolute;inset:0;min-height:0;}
+
+#tempo-app [data-insight="2"] .insight-value {font-size:52px;}
+#tempo-app .insight-value small {font-size:15px;}
+#tempo-app .insight-detail {font-size:15px;}
+#tempo-app .insight-caption {font-size:14px;}
+#tempo-app .thread .series-label {font-size:14px;}
+#tempo-app .thread .series-numbers b {font-size:44px;}
+#tempo-app .thread .insight-detail .series-numbers b {font-size:34px;}
+#tempo-app .thread .series-numbers span span,#tempo-app .thread .series-numbers div span {font-size:14px;line-height:1.45;}
+#tempo-app .thread .series-dates {font-size:14px;}
+#tempo-app .pulse {min-height:560px;}
+@media(max-width:760px){#tempo-app [data-insight="2"] .insight-value {font-size:46px;}#tempo-app .thread .series-numbers b {font-size:38px;}#tempo-app .thread .insight-detail .series-numbers b {font-size:30px;}}
+#tempo-app .thread .insight-canvas {height:260px;}
+
+#tempo-app .period-nav {display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 24px;}
+#tempo-app .period-nav button {min-height:44px;padding:10px 20px;border-radius:9px;background:transparent;color:var(--muted);font-size:16px;}
+#tempo-app .period-nav button[aria-pressed="true"] {background:var(--panel);color:var(--active);}
+#tempo-app .period-nav button:hover:not(:disabled) {color:var(--ink);}
+#tempo-app .period-summary {display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 22px;margin-bottom:25px;}
+#tempo-app .period-label {font:500 18px 'Space Grotesk',sans-serif;}
+#tempo-app .period-total {font-size:16px;color:var(--active);font-variant-numeric:tabular-nums;}
+@media(max-width:650px){#tempo-app .period-nav {gap:4px;}#tempo-app .period-nav button {padding:10px 14px;}#tempo-app .period-summary {gap:8px 16px;}}
