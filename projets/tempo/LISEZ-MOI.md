@@ -52,11 +52,11 @@ Ne supprime pas un `config.php` déjà renseigné lors des prochaines mises à j
 
 Ouvre le premier carnet, ajoute une séance, puis recharge la page : elle doit rester cochée.
 Ouvre ensuite la même adresse sur ton téléphone : la séance doit aussi apparaître.
-Décocher une date retire cette séance de la base.
+Un clic sur un jour sans sport ajoute la séance ; un clic sur un jour avec sport la retire. Ce comportement est identique dans la semaine en haut et sur le calendrier, sans fenêtre de saisie.
 
 Les changements d’un autre appareil sont relus au retour sur la page et toutes les 30 secondes
 lorsque l’onglet est visible. Une modification n’est affichée comme enregistrée qu’après confirmation
-du serveur. En cas de perte de connexion, la saisie reste ouverte avec un message : réessaie après reconnexion.
+du serveur. Pendant la sauvegarde, les clics supplémentaires sont bloqués. En cas de perte de connexion, le jour garde son état précédent et un message indique l’erreur : réessaie après reconnexion.
 
 ## Données et futur login
 
@@ -65,8 +65,8 @@ du serveur. En cas de perte de connexion, la saisie reste ouverte avec un messag
   affiché à côté du libellé compte uniquement les dates de la période sélectionnée, sans les pauses.
 - La date du serveur, dans le fuseau `Europe/Paris`, détermine le jour courant.
 - Le pouls compte les jours de sport sur les 28 derniers jours.
-- Le fil tolère 1 ou 2 jours de pause ; 3 jours interrompent la série.
-- La durée totale va de la première à la dernière séance incluses, pauses intermédiaires comprises.
+- Le fil relie les semaines civiles consécutives (lundi à dimanche) comportant au moins 3 jours de sport, quels que soient les jours choisis. Une semaine en cours ne rompt pas la série précédente avant sa fin. La meilleure série privilégie le nombre de semaines, puis les jours de sport en cas d’égalité.
+- La durée totale couvre les semaines validées, du lundi au dimanche (jusqu’à aujourd’hui pour une semaine en cours déjà validée). Les repos de ces semaines sont légèrement teintés ; les journées futures ne le sont pas.
 - Le record utilise tout l’historique, même les dates qui ne sont plus dans le calendrier.
 - Les données sont associées côté serveur à `user_id = 1`. Le futur login du hub remplacera
   uniquement `currentUserId()` dans `api.php` par l’identifiant de la session.

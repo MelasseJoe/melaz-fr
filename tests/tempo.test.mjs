@@ -22,37 +22,64 @@ test('le total suit la période sélectionnée et compte uniquement les jours de
   assert.throws(()=>calendarWindow('2026-10-14','2027'),/Année invalide/);
 });
 
-test('une ou deux pauses relient les séances, trois coupent entièrement le fil', () => {
-  assert.deepEqual([...bridgeDays(['2026-01-01', '2026-01-03'])], ['2026-01-02']);
-  assert.deepEqual([...bridgeDays(['2026-01-01', '2026-01-04'])], ['2026-01-02', '2026-01-03']);
-  assert.equal(bridgeDays(['2026-01-01', '2026-01-05']).size, 0);
-  assert.deepEqual([...bridgeDays(['2025-12-31', '2026-01-03'])], ['2026-01-01', '2026-01-02']);
+test('trois jours quelconques valident la semaine, même avec quatre repos entre séances', () => {
+  const dates = ['2026-01-05', '2026-01-10', '2026-01-11'];
+  const result = seriesSummary(dates, '2026-01-11');
+  assert.deepEqual(result.current, dates);
+  assert.equal(result.currentWeeks, 1);
+  assert.equal(result.currentDuration, 7);
+  assert.deepEqual([...bridgeDays(dates, '2026-01-11')], ['2026-01-06', '2026-01-07', '2026-01-08', '2026-01-09']);
+  assert.equal(bridgeDays(dates.slice(0, 2), '2026-01-11').size, 0);
 });
 
-test('nombre de jours de sport et durée inclusive de chaque série', () => {
-  const dates = ['2026-01-01', '2026-01-03', '2026-01-06', '2026-01-10'];
-  const result = seriesSummary(dates, '2026-01-10');
-  assert.deepEqual(result.record, dates.slice(0, 3));
-  assert.equal(result.recordDuration, 6);
-  assert.deepEqual(result.current, ['2026-01-10']);
-  assert.equal(result.currentDuration, 1);
-  assert.equal(seriesSummary(dates, '2026-01-12').current.length, 1);
-  assert.equal(seriesSummary(dates, '2026-01-13').current.length, 0);
+test('les semaines sont civiles et la série traverse le changement d’année', () => {
+  const dates = ['2025-12-29','2025-12-31','2026-01-04','2026-01-05','2026-01-09','2026-01-11'];
+  const result = seriesSummary(dates, '2026-01-11');
+  assert.equal(result.recordWeeks, 2);
+  assert.equal(result.record.length, 6);
+  assert.equal(result.recordDuration, 14);
+  assert.equal(result.recordStart, '2025-12-29');
+  assert.equal(result.recordEnd, '2026-01-11');
+  assert.equal(seriesSummary(['2026-01-04','2026-01-05','2026-01-06'], '2026-01-06').recordWeeks, 0);
 });
 
-test('record conservé hors de la fenêtre, égalité départagée par durée', () => {
-  const result = seriesSummary(['2023-01-01', '2023-01-02', '2023-01-05', '2023-01-08'], '2026-10-14');
-  assert.equal(result.record.length, 4);
-  assert.equal(result.recordDuration, 8);
-  const tied = seriesSummary(['2026-01-01', '2026-01-02', '2026-01-10', '2026-01-13'], '2026-01-13');
-  assert.deepEqual(tied.record, ['2026-01-10', '2026-01-13']);
+test('la semaine en cours laisse le temps de valider, une semaine ratée coupe le fil', () => {
+  const dates = ['2026-01-05','2026-01-07','2026-01-09','2026-01-12','2026-01-18'];
+  assert.equal(seriesSummary(dates, '2026-01-12').currentWeeks, 1);
+  assert.equal(seriesSummary(dates, '2026-01-18').currentWeeks, 1);
+  assert.equal(seriesSummary(dates, '2026-01-19').currentWeeks, 0);
+  assert.equal(seriesSummary(dates, '2026-01-19').recordWeeks, 1);
+  const resumed = seriesSummary([...dates,'2026-01-19','2026-01-21','2026-01-23'], '2026-01-25');
+  assert.equal(resumed.currentWeeks, 1);
+  assert.equal(resumed.recordWeeks, 1);
 });
 
-test('dates futures, doublons et dates impossibles ignorés dans les séries', () => {
-  const result = seriesSummary(['2026-01-01', '2026-01-01', '2026-01-10', '2026-02-30'], '2026-01-02');
-  assert.deepEqual(result.record, ['2026-01-01']);
-  assert.equal(result.recordDuration, 1);
-  assert.deepEqual(seriesSummary([], '2026-01-02').record, []);
+test('validation immédiate au troisième jour, aucun repos futur teinté', () => {
+  const dates = ['2026-01-05','2026-01-06','2026-01-07'];
+  const result = seriesSummary(dates, '2026-01-07');
+  assert.equal(result.currentWeeks, 1);
+  assert.equal(result.currentDuration, 3);
+  assert.equal(result.recordEnd, '2026-01-07');
+  assert.equal(bridgeDays(dates, '2026-01-07').size, 0);
+  assert.equal(bridgeDays(dates, '2026-01-09').has('2026-01-08'), true);
+  assert.equal(bridgeDays(dates, '2026-01-09').has('2026-01-10'), false);
+});
+
+test('le record privilégie les semaines puis les séances et reste disponible hors de la fenêtre', () => {
+  const old = ['2023-01-02','2023-01-04','2023-01-08','2023-01-09','2023-01-11','2023-01-15'];
+  const busyWeek = ['2026-01-05','2026-01-06','2026-01-07','2026-01-08','2026-01-09','2026-01-10','2026-01-11'];
+  const result = seriesSummary([...busyWeek,...old], '2026-10-15');
+  assert.deepEqual(result.record, old);
+  assert.equal(result.recordDuration, 14);
+  const tied = seriesSummary([...old.slice(0,3), ...busyWeek], '2026-10-15');
+  assert.deepEqual(tied.record, busyWeek);
+});
+
+test('dates futures, doublons et dates impossibles ne valident pas une semaine', () => {
+  const result = seriesSummary(['2026-01-05','2026-01-05','2026-01-07','2026-01-09','2026-02-30'], '2026-01-07');
+  assert.equal(result.currentWeeks, 0);
+  assert.deepEqual(result.record, []);
+  assert.deepEqual(seriesSummary([], '2026-01-07').record, []);
 });
 
 test('la sauvegarde utilise la session serveur et attend une confirmation exacte', async () => {

@@ -42,29 +42,60 @@ export function seriesDuration(series) {
   return series.length ? (utcDate(series.at(-1)) - utcDate(series[0])) / DAY_MS + 1 : 0;
 }
 
-export function seriesSummary(sessions, today) {
-  const ordered = [...new Set(sessions)].filter(key => validDate(key) && key <= today).sort();
-  const groups = [];
-  for (const key of ordered) {
-    const previous = groups.at(-1);
-    if (!previous || (utcDate(key) - utcDate(previous.at(-1))) / DAY_MS > 3) groups.push([key]);
-    else previous.push(key);
+// Une semaine civile (lundi–dimanche) est validée à partir de trois jours de sport.
+export function sportWeeks(sessions, today) {
+  if (!validDate(today)) throw new Error('Date invalide');
+  const weeks = new Map();
+  for (const key of [...new Set(sessions)].filter(key => validDate(key) && key <= today).sort()) {
+    const monday = iso(mondayFor(utcDate(key)));
+    if (!weeks.has(monday)) weeks.set(monday, []);
+    weeks.get(monday).push(key);
   }
-  const last = groups.at(-1) || [];
-  const current = last.length && (utcDate(today) - utcDate(last.at(-1))) / DAY_MS <= 2 ? last : [];
-  const record = groups.reduce((winner, group) => group.length > winner.length
-    || (group.length === winner.length && seriesDuration(group) > seriesDuration(winner)) ? group : winner, []);
-  return { current, record, currentDuration: seriesDuration(current), recordDuration: seriesDuration(record) };
+  return weeks;
 }
 
-export function bridgeDays(sessions) {
+export function seriesSummary(sessions, today) {
+  const weeks = sportWeeks(sessions, today);
+  const thisMonday = iso(mondayFor(utcDate(today)));
+  const previousMonday = iso(new Date(+utcDate(thisMonday) - 7 * DAY_MS));
+  const groups = [];
+  for (const [monday, days] of weeks) {
+    if (days.length < 3) continue;
+    const last = groups.at(-1);
+    if (!last || +utcDate(monday) - +utcDate(last.at(-1).monday) !== 7 * DAY_MS) groups.push([]);
+    groups.at(-1).push({ monday, days });
+  }
+  const last = groups.at(-1) || [];
+  // Une semaine encore en cours ne rompt pas une série déjà validée.
+  const currentGroup = last.length && [thisMonday, previousMonday].includes(last.at(-1).monday) ? last : [];
+  const count = group => group.reduce((sum, week) => sum + week.days.length, 0);
+  const recordGroup = groups.reduce((winner, group) => group.length > winner.length
+    || (group.length === winner.length && count(group) > count(winner)) ? group : winner, []);
+  const period = group => {
+    if (!group.length) return { days: [], start: null, end: null, duration: 0 };
+    const start = group[0].monday;
+    const end = iso(new Date(Math.min(+utcDate(today), +utcDate(group.at(-1).monday) + 6 * DAY_MS)));
+    return { days: group.flatMap(week => week.days), start, end, duration: (+utcDate(end) - +utcDate(start)) / DAY_MS + 1 };
+  };
+  const current = period(currentGroup), record = period(recordGroup);
+  return { current: current.days, record: record.days,
+    currentDuration: current.duration, recordDuration: record.duration,
+    currentWeeks: currentGroup.length, recordWeeks: recordGroup.length,
+    currentStart: current.start, currentEnd: current.end, recordStart: record.start, recordEnd: record.end,
+    thisWeekCount: (weeks.get(thisMonday) || []).length };
+}
+
+export function bridgeDays(sessions, today) {
   const ordered = [...new Set(sessions)].filter(validDate).sort();
+  const end = today || ordered.at(-1);
+  if (!end) return new Set();
+  const active = new Set(ordered);
   const bridges = new Set();
-  for (let i = 1; i < ordered.length; i++) {
-    const before = utcDate(ordered[i - 1]);
-    const pause = (utcDate(ordered[i]) - before) / DAY_MS - 1;
-    if (pause >= 1 && pause <= 2) {
-      for (let j = 1; j <= pause; j++) bridges.add(iso(new Date(+before + j * DAY_MS)));
+  for (const [monday, days] of sportWeeks(ordered, end)) {
+    if (days.length < 3) continue;
+    for (let i = 0; i < 7; i++) {
+      const key = iso(new Date(+utcDate(monday) + i * DAY_MS));
+      if (key <= end && !active.has(key)) bridges.add(key);
     }
   }
   return bridges;
