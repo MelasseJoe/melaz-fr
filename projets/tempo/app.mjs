@@ -108,7 +108,8 @@ import { TempoStore } from './store.mjs';
    const focusedDay=page.querySelector('.week-day:focus')?.dataset.date;
    mutating=true;syncGeneration++;
    root.setAttribute('aria-busy','true');updateAll();
-   networkStatus('Enregistrement…');
+   networkStatus('');
+   page.querySelector('.message').textContent='Enregistrement…';
    try{
     await store.setDay(key,on);
     if(on)active.add(key);else active.delete(key);
@@ -117,7 +118,7 @@ import { TempoStore } from './store.mjs';
    }catch(error){networkStatus(error.message,true);}
    finally{
     mutating=false;root.removeAttribute('aria-busy');updateAll();
-    if(focusedDay)page.querySelector('.week-day[data-date="'+focusedDay+'"]').focus();
+    if(focusedDay)page.querySelector('.week-day[data-date="'+focusedDay+'"]').focus({preventScroll:true});
    }
   };
   canvas.addEventListener('click',event=>{const r=canvas.getBoundingClientRect(),x=event.clientX-r.left,y=event.clientY-r.top;const hit=state.hits.find(p=>x>=p.x-1.5&&x<=p.x+p.width+1.5&&y>=p.y-1.5&&y<=p.y+p.height+1.5);if(hit)toggleDay(hit.date);});
