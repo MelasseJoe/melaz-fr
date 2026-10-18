@@ -4,7 +4,7 @@
    cover: 'tempo' applique le carnet graphite ; 'en-route' applique le carnet lin. */
 window.HUB_PROJECTS = [
   { title: 'Tempo', description: 'Mon rythme sportif', icon: 'dumbbell', cover: 'tempo', url: './projets/tempo/' },
-  { title: 'En route.', description: 'Mes prochaines minutes', icon: 'ticket', cover: 'en-route', url: './projets/en-route/' },
+  { title: 'Entre deux rames', description: 'Mes prochaines minutes', icon: 'ticket', cover: 'en-route', url: './projets/en-route/' },
   { title: 'Projet 3', description: 'À venir', icon: 'orbit', url: null },
   { title: 'Projet 4', description: 'À venir', icon: 'plus', url: null },
   { title: 'Projet 5', description: 'À venir', icon: 'waves', url: null },

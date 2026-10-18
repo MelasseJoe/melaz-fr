@@ -67,7 +67,11 @@ function options(select, rows, preferred, placeholder) {
   select.disabled = false;
 }
 
-function setConnection(copy) { $('#connection-state').textContent = copy; }
+function setConnection(copy) {
+  const normal = copy === 'Informations voyageurs · actualisation automatique';
+  $('#connection-state').textContent = normal ? '' : copy;
+  $('#connection-state').hidden = normal;
+}
 function lineBadge(code) { return element('span', 'mt-line', code || 'M'); }
 function setSelectionTitle() {
   const line = state.lines.find(line => line.id === $('#line').value);

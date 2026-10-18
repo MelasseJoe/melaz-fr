@@ -152,6 +152,6 @@ try {
     respond($error->status, ['error' => $error->getMessage(), 'code' => $error->kind]);
 } catch (Throwable $error) {
     // Ne jamais journaliser la clé, la réponse de l’API ou le contenu d’une adresse recherchée.
-    error_log('En route: ' . get_class($error));
+    error_log('Entre deux rames: ' . get_class($error));
     respond(503, ['error' => 'Le service est momentanément indisponible. Réessaie plus tard.', 'code' => 'unavailable']);
 }

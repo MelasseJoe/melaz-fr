@@ -1,4 +1,4 @@
-# En route. — Lin & café
+# Entre deux rames — Lin & café
 
 Le deuxième carnet du hub ouvre `projets/en-route/`. La page reprend les deux billets alignés et la palette Lin & café : fond lin, papier crème, encre café et messages sur fond gris chaud.
 

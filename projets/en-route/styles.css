@@ -183,3 +183,14 @@ body{margin:0;background:light-dark(#e9e3da,#282522)}
 #en-route .mt-departures[data-line-color]:before{border-color:color-mix(in srgb,var(--route-color) 45%,var(--mt-line))}
 #en-route .mt-departures[data-line-color] .direction-heading:before{content:'';display:inline-block;width:5px;height:14px;margin-right:8px;vertical-align:-2px;background:var(--route-color);border-radius:2px}
 #en-route .mt-departures[data-line-color] .mt-messages{border-top-color:color-mix(in srgb,var(--route-color) 55%,var(--mt-line))}
+
+/* En-tête épuré et retour au hub à gauche. */
+#en-route .mt-top>.back-hub{font-size:12px}
+#en-route .mt-app .mt-intro{padding-right:0}
+#en-route .mt-app .mt-intro:after{content:none;display:none}
+
+/* Barre de retour plus compacte. */
+#en-route .mt-app{padding-top:18px}
+#en-route .mt-top{min-height:34px;padding-bottom:10px;margin-bottom:14px}
+@media(min-width:1360px){#en-route .mt-app{padding-top:24px}}
+@media(max-width:650px){#en-route .mt-app{padding-top:14px}}

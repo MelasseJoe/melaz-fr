@@ -1,9 +1,9 @@
 # Hub projet — Mise en ligne
 
-Le hub reste statique, sans compilation. Son premier carnet ouvre Tempo, le calendrier de sport ; le deuxième ouvre **En route.**, les prochains métros et itinéraires dans la palette Lin & café.
+Le hub reste statique, sans compilation. Son premier carnet ouvre Tempo, le calendrier de sport ; le deuxième ouvre **Entre deux rames**, les prochains métros et itinéraires dans la palette Lin & café.
 Tempo nécessite PHP 8.1 minimum et une base MySQL/MariaDB pour sauvegarder les saisies entre appareils.
 Les étapes OVH Starter sont dans `projets/tempo/LISEZ-MOI.md`.
-En route utilise PHP 8.1 et cURL, sans base de données. Pour ajouter ta clé PRIM, suis `projets/en-route/LISEZ-MOI.md` : le fichier privé `en-route-config.php` se place au-dessus de `www`.
+Entre deux rames utilise PHP 8.1 et cURL, sans base de données. Pour ajouter ta clé PRIM, suis `projets/en-route/LISEZ-MOI.md` : le fichier privé `en-route-config.php` se place au-dessus de `www`.
 
 ## Transférer le site
 

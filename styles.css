@@ -328,8 +328,22 @@ body {margin:0;}
 #hub-galerie .tempo-page-calendar i {display:block;aspect-ratio:1;background:#d4dfd4;border-radius:1px;}
 #hub-galerie .tempo-page-calendar i.sport {background:#5f9678;}
 
-/* Carnet En route : les tons lin et café du billet de transport. */
+/* Carnet Entre deux rames : les tons lin et café du billet de transport. */
 #hub-galerie .transit-project {--folder-edge:#75675a;--folder-back:#a89b88;--folder-front:#d7cbb9;--folder-light:#e8dfd1;--sheet:#faf6ec;--rule:#c7beb2;}
 #hub-galerie .transit-project .object-icon {color:#6b574b;}
 #hub-galerie .transit-project .object-number {color:#857264;}
 #hub-galerie .transit-project .book-ribbon {background:#6b574b;}
+
+/* Entre deux rames — Ticket composté, couverture de lin et billet ivoire. */
+#hub-galerie .transit-project {--folder-edge:#a7977c;--folder-back:#c6b89f;--folder-front:#e1d7c3;--folder-light:#ece4d2;--transit-ink:#51473a;--transit-gold:#a48a56;--transit-ticket:#fcf6e5;}
+#hub-galerie .transit-project .book-cover {background:repeating-linear-gradient(90deg,transparent 0 2px,#51473a08 2px 3px),linear-gradient(110deg,var(--folder-back),var(--folder-light) 28%,var(--folder-front));box-shadow:inset 0 0 0 3px #fff8e828,inset 0 0 0 4px #a7977c80,2px 0 0 var(--folder-edge),0 2px 0 var(--folder-edge);}
+#hub-galerie .transit-project .book-ribbon {background:#987a42;}
+#hub-galerie .transit-cover-kicker,#hub-galerie .transit-cover-footer {position:absolute;left:13px;right:5px;text-align:center;font:400 5.5px/1.5 'Space Grotesk',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--transit-ink);}
+#hub-galerie .transit-cover-kicker {top:15px;}
+#hub-galerie .transit-cover-footer {bottom:12px;}
+#hub-galerie .transit-ticket {position:absolute;top:34px;left:20px;right:10px;height:78px;padding:9px 7px 7px;display:flex;align-items:center;flex-direction:column;background:var(--transit-ticket);border:1px solid var(--transit-gold);color:var(--transit-ink);transform:translateZ(1px) rotate(-8deg);box-shadow:2px 4px 5px #51473a26;}
+#hub-galerie .transit-ticket:before,#hub-galerie .transit-ticket:after {content:'';position:absolute;top:calc(50% - 4px);width:8px;height:8px;border-radius:50%;background:var(--folder-front);}
+#hub-galerie .transit-ticket:before {left:-5px;box-shadow:1px 0 0 var(--transit-gold);}
+#hub-galerie .transit-ticket:after {right:-5px;box-shadow:-1px 0 0 var(--transit-gold);}
+#hub-galerie .transit-ticket-kicker,#hub-galerie .transit-ticket-city {font:400 5px/1.4 'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;}
+#hub-galerie .transit-ticket-title {font:400 12px/1.02 'Playfair Display',Georgia,serif;text-align:center;margin:5px 0 4px;letter-spacing:-.3px;}

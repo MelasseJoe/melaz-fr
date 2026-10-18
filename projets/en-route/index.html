@@ -5,19 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#e9e3da">
   <meta name="description" content="Les prochains métros, les messages voyageurs et votre itinéraire en Île-de-France.">
-  <title>En route. — Les prochaines minutes</title>
+  <title>Entre deux rames — Les prochaines minutes</title>
   <link rel="icon" href="../../assets/favicon.jpg" type="image/jpeg">
   <link rel="stylesheet" href="../../assets/fonts.css">
-  <link rel="stylesheet" href="styles.css?v=20261016-7">
-  <script type="module" src="app.js?v=20261016-6"></script>
+  <link rel="stylesheet" href="styles.css?v=20261018-2">
+  <script type="module" src="app.js?v=20261018-1"></script>
 </head>
 <body id="en-route">
 <main class="mt-app" data-palette="lin" data-layout="composte">
   <header class="mt-top">
-    <div class="mt-brand">En route.</div>
+    <a class="back-hub" href="../../" aria-label="Retour au hub"><span aria-hidden="true">←</span> Le hub</a>
     <div class="header-tools">
-      <a class="back-hub" href="../../" aria-label="Retour au hub"><span aria-hidden="true">←</span> Le hub</a>
-      <span class="header-rule" aria-hidden="true"></span>
       <button id="refresh" type="button" class="quiet-button">Actualiser <span aria-hidden="true">↻</span></button>
     </div>
   </header>
@@ -33,10 +31,8 @@
   </section>
 
   <div class="mt-intro">
-    <p class="mt-kicker">Paris / Métro</p>
     <h1>Un billet pour<br>les prochaines minutes.</h1>
-    <p class="mt-intro-note">Paris se prend au vol.</p>
-    <p id="connection-state" class="connection-state" role="status">Connexion aux données…</p>
+    <p id="connection-state" class="connection-state" role="status" hidden></p>
   </div>
 
   <div class="mt-workspace">
