@@ -11,6 +11,7 @@
  page.style.setProperty('--bg-opacity', BACKGROUND_OPACITY);
  page.style.setProperty('--opening', OPENING);
  const paths = {
+  ticket: '<path d="M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4V5Z"/><path d="M15 5v2m0 3v2m0 3v4M7 9h4m-4 5h4"/>',
   dumbbell: '<path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829Z"/><path d="m2.5 21.5 1.4-1.4m16.2-16.2 1.4-1.4M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829Zm4.257-7.085 4.8-4.8"/>',
   sparkles: '<path d="m12 3 2.8 6.2L21 12l-6.2 2.8L12 21l-2.8-6.2L3 12l6.2-2.8Z"/><path d="M20 2v4M18 4h4"/>',
   braces: '<path d="M8 3H6a2 2 0 0 0-2 2v4a3 3 0 0 1-2 3 3 3 0 0 1 2 3v4a2 2 0 0 0 2 2h2M16 3h2a2 2 0 0 1 2 2v4a3 3 0 0 0 2 3 3 3 0 0 0-2 3v4a2 2 0 0 1-2 2h-2"/>',
@@ -32,7 +33,7 @@
   const item = document.createElement(url ? 'a' : 'button');
   if (url) item.href = url; else item.type = 'button';
   const tempoCover = project.cover === 'tempo';
-  item.className = 'project' + (tempoCover ? ' tempo-project' : '');
+  item.className = 'project' + (tempoCover ? ' tempo-project' : '') + (project.cover === 'en-route' ? ' transit-project' : '');
   item.setAttribute('aria-label', (url ? 'Ouvrir ' : 'Découvrir ') + project.title);
   const preview = document.createElement('span');
   preview.className = 'folder-preview';

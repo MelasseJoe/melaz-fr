@@ -1,5 +1,8 @@
 .DS_Store
 **/config.php
 **/tempo-config.php
+**/en-route-config.php
+**/.en-route-cache/
+**/*.sql
 # Historique personnel de sport : ne pas publier l'import sur GitHub.
 /imports/import-sport-2022-2026.sql

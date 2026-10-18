@@ -327,3 +327,9 @@ body {margin:0;}
 #hub-galerie .tempo-page-calendar {position:absolute;inset:27% 14% auto 18%;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;}
 #hub-galerie .tempo-page-calendar i {display:block;aspect-ratio:1;background:#d4dfd4;border-radius:1px;}
 #hub-galerie .tempo-page-calendar i.sport {background:#5f9678;}
+
+/* Carnet En route : les tons lin et café du billet de transport. */
+#hub-galerie .transit-project {--folder-edge:#75675a;--folder-back:#a89b88;--folder-front:#d7cbb9;--folder-light:#e8dfd1;--sheet:#faf6ec;--rule:#c7beb2;}
+#hub-galerie .transit-project .object-icon {color:#6b574b;}
+#hub-galerie .transit-project .object-number {color:#857264;}
+#hub-galerie .transit-project .book-ribbon {background:#6b574b;}

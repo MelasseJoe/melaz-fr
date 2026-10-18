@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e9e3da">
+  <meta name="description" content="Les prochains métros, les messages voyageurs et votre itinéraire en Île-de-France.">
+  <title>En route. — Les prochaines minutes</title>
+  <link rel="icon" href="../../assets/favicon.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../../assets/fonts.css">
+  <link rel="stylesheet" href="styles.css?v=20261016-7">
+  <script type="module" src="app.js?v=20261016-6"></script>
+</head>
+<body id="en-route">
+<main class="mt-app" data-palette="lin" data-layout="composte">
+  <header class="mt-top">
+    <div class="mt-brand">En route.</div>
+    <div class="header-tools">
+      <a class="back-hub" href="../../" aria-label="Retour au hub"><span aria-hidden="true">←</span> Le hub</a>
+      <span class="header-rule" aria-hidden="true"></span>
+      <button id="refresh" type="button" class="quiet-button">Actualiser <span aria-hidden="true">↻</span></button>
+    </div>
+  </header>
+
+  <section class="mt-traffic" aria-labelledby="traffic-title" aria-busy="true">
+    <div class="mt-traffic-head"><h2 id="traffic-title">Perturbations en cours</h2><span id="traffic-update">Métro &amp; RER · Île-de-France</span></div>
+    <p id="traffic-state" class="section-state" role="status">Consultation du réseau…</p>
+    <div id="traffic-list" class="mt-alerts"></div>
+    <details id="traffic-more" class="traffic-more" hidden>
+      <summary class="quiet-button">Toutes les perturbations</summary>
+      <div id="traffic-rest" class="mt-alerts"></div>
+    </details>
+  </section>
+
+  <div class="mt-intro">
+    <p class="mt-kicker">Paris / Métro</p>
+    <h1>Un billet pour<br>les prochaines minutes.</h1>
+    <p class="mt-intro-note">Paris se prend au vol.</p>
+    <p id="connection-state" class="connection-state" role="status">Connexion aux données…</p>
+  </div>
+
+  <div class="mt-workspace">
+    <article class="mt-departures" aria-labelledby="departures-title">
+      <div class="mt-section-head"><h2 id="departures-title">Prochains passages</h2><span class="mt-index">01 / Départs</span></div>
+      <div class="mt-selector">
+        <label for="line"><span>Ligne</span><select id="line" disabled><option value="">—</option></select></label>
+        <label for="stop"><span>Arrêt</span><select id="stop" disabled><option value="">Choisir un arrêt</option></select></label>
+      </div>
+      <div id="passages" class="mt-result" aria-busy="false">
+        <div class="mt-result-title"><span id="result-badge" class="mt-line" aria-label="Métro">M</span><div><span id="station-name" class="mt-station-name">Votre prochain métro</span><span id="direction-name" class="mt-direction-name">Choisissez une ligne et un arrêt.</span></div></div>
+        <div id="departure-times" class="direction-list" aria-label="Prochains passages dans chaque sens"></div>
+        <p id="departure-state" class="departure-state" role="status">Les prochains passages s’afficheront ici.</p>
+        <div class="mt-time-note"><span>Horaires estimés, non garantis</span><span id="departure-update">En attente de données</span></div>
+      </div>
+      <section class="mt-messages" aria-labelledby="messages-title" aria-busy="false">
+        <h3 id="messages-title" class="mt-message-head"><span class="screen-symbol" aria-hidden="true"></span>Messages des écrans RATP</h3>
+        <div id="screen-messages"><p class="mt-message-copy">Les informations de votre station et de votre ligne apparaîtront ici.</p></div>
+        <p id="message-update" class="mt-message-scope">Tous sens, sauf indication dans le message.</p>
+      </section>
+    </article>
+
+    <article class="mt-journey" aria-labelledby="journey-title">
+      <div class="mt-section-head"><h2 id="journey-title">Où allons-nous ?</h2><span class="mt-index">02 / Itinéraire</span></div>
+      <form id="journey-form" novalidate>
+        <div class="mt-journey-fields">
+          <div class="mt-trip-point"><i aria-hidden="true"></i><div class="place-field"><label for="from"><span>Départ</span></label><input id="from" type="search" placeholder="Une station, une adresse…" autocomplete="off" maxlength="120" aria-describedby="from-help" disabled><p id="from-help" class="place-help" role="status"></p><ul id="from-suggestions" class="place-suggestions" aria-label="Suggestions de départ" hidden></ul></div></div>
+          <div class="mt-trip-point"><i aria-hidden="true"></i><div class="place-field"><label for="to"><span>Arrivée</span></label><input id="to" type="search" placeholder="Où souhaitez-vous aller ?" autocomplete="off" maxlength="120" aria-describedby="to-help" disabled><p id="to-help" class="place-help" role="status"></p><ul id="to-suggestions" class="place-suggestions" aria-label="Suggestions d’arrivée" hidden></ul></div></div>
+        </div>
+        <button type="submit" id="plan" class="mt-plan-button" disabled><span>Calculer mon itinéraire</span><span aria-hidden="true">↗</span></button>
+        <p id="journey-error" class="journey-error" role="alert"></p>
+      </form>
+      <div id="journey-results" class="mt-trip-result" aria-live="polite" aria-busy="false"><div class="journey-empty"><span class="mt-index">UN DÉPART. UNE DESTINATION.</span><p>Le reste du chemin<br>commence ici.</p><span class="mt-trip-note">Métro, RER, train, tramway, bus et marche.</span></div></div>
+    </article>
+  </div>
+  <footer class="mt-footer"><span>Données Île-de-France Mobilités / PRIM · RATP et opérateurs du réseau</span><time id="page-clock"></time></footer>
+  <noscript><p>Active JavaScript pour rechercher les prochains passages et calculer un itinéraire.</p></noscript>
+</main>
+</body>
+</html>

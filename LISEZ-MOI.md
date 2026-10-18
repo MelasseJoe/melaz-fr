@@ -1,8 +1,9 @@
 # Hub projet — Mise en ligne
 
-Le hub reste statique, sans compilation. Son premier carnet ouvre désormais Tempo, le calendrier de sport.
+Le hub reste statique, sans compilation. Son premier carnet ouvre Tempo, le calendrier de sport ; le deuxième ouvre **En route.**, les prochains métros et itinéraires dans la palette Lin & café.
 Tempo nécessite PHP 8.1 minimum et une base MySQL/MariaDB pour sauvegarder les saisies entre appareils.
 Les étapes OVH Starter sont dans `projets/tempo/LISEZ-MOI.md`.
+En route utilise PHP 8.1 et cURL, sans base de données. Pour ajouter ta clé PRIM, suis `projets/en-route/LISEZ-MOI.md` : le fichier privé `en-route-config.php` se place au-dessus de `www`.
 
 ## Transférer le site
 
@@ -22,9 +23,9 @@ Ouvre `projets.js` avec un éditeur de texte. Chaque entrée définit un carnet 
 
 - `title` : nom sous le carnet.
 - `description` : texte secondaire.
-- `icon` : `sparkles`, `braces`, `orbit`, `plus`, `waves` ou `ellipsis`.
+- `icon` : `sparkles`, `braces`, `orbit`, `plus`, `waves`, `ellipsis`, `dumbbell` ou `ticket`.
 - `url` : `null` pour un emplacement à venir ; un chemin relatif (`./projets/mon-outil/`) ou une adresse HTTPS pour ouvrir un projet dans le même onglet.
-- `cover` : `'tempo'` applique la couverture graphite et menthe avec calendrier et haltère. Sans cette propriété, le carnet classique est conservé.
+- `cover` : `'tempo'` applique la couverture graphite et menthe avec calendrier et haltère ; `'en-route'` applique les tons lin et café. Sans cette propriété, le carnet classique est conservé.
 
 Tu peux ajouter ou retirer des entrées : la grille se réorganise automatiquement. Respecte les virgules entre les entrées. Aucun numéro de dossier n’est à renseigner : il est calculé automatiquement.
 
