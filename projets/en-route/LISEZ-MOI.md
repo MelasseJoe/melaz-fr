@@ -32,7 +32,7 @@ Le deuxième carnet du hub ouvre `projets/en-route/`. La page reprend les deux b
 
 5. Ouvre le deuxième carnet du hub, puis clique sur **Actualiser** ou recharge la page.
 
-Le cache est créé automatiquement à côté du fichier de configuration. Si PHP ne peut pas écrire dans ce dossier, crée `.en-route-cache` via ton client SFTP et donne-lui les droits 700 ; ajuste `cache_dir` dans le fichier privé si ton hébergement utilise un autre chemin. PHP 8.1 minimum et l’extension cURL sont nécessaires ; aucune base de données n’est requise pour ce projet.
+Le cache est créé automatiquement à côté du fichier de configuration. Si PHP ne peut pas écrire dans ce dossier, crée `.en-route-cache` via ton client SFTP et donne-lui les droits 700 ; ajuste `cache_dir` dans le fichier privé si ton hébergement utilise un autre chemin. PHP 8.1 minimum et l’extension cURL sont nécessaires ; la connexion commune et les préférences par compte nécessitent la base MySQL/MariaDB du hub (voir `../../auth/LISEZ-MOI.md`).
 
 Une configuration par variables d’environnement est aussi possible : `PRIM_API_KEY` pour la clé, `EN_ROUTE_CONFIG` pour le chemin absolu du fichier privé. Le repli `projets/en-route/config.php` est pris en charge et refusé en HTTP par le `.htaccess`, mais la configuration **hors de `www`** reste celle recommandée. Dans le cas de ce repli, remplace `cache_dir` par `dirname(__DIR__, 3) . '/.en-route-cache'` afin de garder les caches privés.
 
@@ -44,7 +44,7 @@ Une configuration par variables d’environnement est aussi possible : `PRIM_API
 - Messages des écrans de la station et de la ligne, dédoublonnés. Le service ne garantit pas un filtre par direction : les messages sont présentés comme tous sens, sauf indication dans leur texte.
 - Perturbations actuellement applicables aux lignes de métro et de RER du flux Navitia, en excluant les alertes concernant les ascenseurs, escalators et autres équipements. Les trois premières sont visibles ; les autres restent accessibles dans « Voir les … perturbations ». Les périodes futures ou terminées sont exclues. Une erreur de collecte ne devient jamais « aucune perturbation ».
 - Recherche de stations, adresses et lieux avec suggestions ; jusqu’à trois itinéraires, étapes, directions, correspondances, marche et horaires pour un départ maintenant. Le calcul peut proposer d’autres modes que le métro.
-- Dernière ligne et station mémorisées **dans ce navigateur**. Les adresses saisies ne sont pas mémorisées côté navigateur.
+- Dernière ligne et station sauvegardées **en base pour le compte connecté**, puis restaurées sur les autres appareils. Les adresses saisies ne sont pas mémorisées côté navigateur.
 - Bouton de retour au hub ; thème clair ou sombre selon le système ; adaptation mobile et clavier.
 
 Sans clé, la page affiche un état « connexion non activée » : aucun horaire, message ou trajet fictif n’est présenté comme réel. Une clé refusée ou un service non autorisé produit un message explicite. Les appels authentifiés avec ta clé doivent être vérifiés après son ajout sur ton hébergement.
@@ -74,6 +74,6 @@ La disponibilité et la couverture dépendent de PRIM et des transporteurs. Un r
 
 ## Confidentialité et déploiement
 
-Les fichiers de configuration privés et `.en-route-cache` sont exclus par les `.gitignore`. Les SQL personnels existants restent exclus. Le cache peut contenir des recherches de lieux et de trajets : conserve-le hors de `www`. Le site n’a pas encore de login ; les visiteurs du hub peuvent consulter ces services et consommer le budget commun, comme prévu pour cette première version.
+Les fichiers de configuration privés et `.en-route-cache` sont exclus par les `.gitignore`. Les SQL personnels existants restent exclus. Le cache peut contenir des recherches de lieux et de trajets : conserve-le hors de `www`. La connexion du hub est obligatoire pour cette page et son API. Les comptes partagent le budget PRIM, mais leurs préférences sont séparées.
 
 Les polices libres DM Serif Display et DM Mono sont incluses dans `assets`, avec leurs licences OFL. DM Sans est réutilisée depuis les ressources locales du hub. Aucun CDN, aucune compilation, aucune archive ZIP.

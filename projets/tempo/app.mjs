@@ -1,5 +1,5 @@
 import { dateWindow, calendarWindow, countSportDays, mondayFor, validDate, bridgeDays, seriesSummary } from './core.mjs';
-import { TempoStore } from './store.mjs';
+import { TempoStore } from './store.mjs?v=20261018-auth-1';
 
 (() => {
  const root=document.getElementById('tempo-app');

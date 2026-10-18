@@ -18,6 +18,9 @@ export class TempoStore {
       let data;
       try { data = await response.json(); }
       catch { throw new Error('Le serveur ne renvoie pas de données valides. Vérifie que PHP est activé.'); }
+      if (response.status === 401 && typeof window !== 'undefined' && window.HubSession) {
+        location.replace(new URL('login.php?next=' + encodeURIComponent(location.pathname), window.HubSession.base));
+      }
       if (!response.ok) throw new Error(data.error || 'Le serveur est indisponible.');
       return data;
     } catch (error) {

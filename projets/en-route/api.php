@@ -2,6 +2,10 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/lib.php';
+require_once dirname(__DIR__, 2) . '/auth/lib.php';
+HubAuth\requireUser();
+$hubCsrf = HubAuth\csrf();
+session_write_close();
 
 use EnRoute\ApiError;
 use EnRoute\PrimClient;
@@ -39,6 +43,7 @@ try {
     if (strtolower($_SERVER['HTTP_SEC_FETCH_SITE'] ?? '') === 'cross-site') throw new ApiError('Requête intersite refusée.', 403, 'forbidden');
     $action = parameter($_GET, 'action', 20) ?: 'status';
     if (!in_array($action, ['status', 'lines', 'stops', 'departures', 'messages', 'traffic', 'places', 'journeys'], true)) throw new ApiError('Cette recherche n’existe pas.', 404, 'not_found');
+    if ($method === 'POST' && !hash_equals($hubCsrf, (string) ($_SERVER['HTTP_X_HUB_CSRF'] ?? ''))) throw new ApiError('La session a expiré. Recharge la page.', 403, 'forbidden');
     if (($action === 'journeys') !== ($method === 'POST')) throw new ApiError('Méthode non autorisée pour cette recherche.', 405, 'invalid_method');
 
     $configPath = getenv('EN_ROUTE_CONFIG') ?: dirname(__DIR__, 3) . '/en-route-config.php';

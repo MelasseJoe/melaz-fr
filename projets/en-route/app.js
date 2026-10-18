@@ -11,12 +11,18 @@ const duration = seconds => {
   return minutes >= 60 ? `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, '0')}` : `${minutes} min`;
 };
 const state = { configured: false, lines: [], stops: [], data: null, lineSequence: 0, selectionSequence: 0, controller: null, lastTraffic: 0, lastMessages: 0, refreshing: false };
-const preferenceKey = 'en-route-selection-v1';
 let preferences = {};
-try { preferences = JSON.parse(localStorage.getItem(preferenceKey) || '{}') || {}; } catch { /* Navigation privée. */ }
+let preferenceTimer = null;
+let preferenceQueue = Promise.resolve();
 const remember = () => {
   preferences = { line: $('#line').value, stop: $('#stop').value };
-  try { localStorage.setItem(preferenceKey, JSON.stringify(preferences)); } catch { /* Le site reste utilisable. */ }
+  clearTimeout(preferenceTimer);
+  const value = { ...preferences };
+  preferenceTimer = setTimeout(() => {
+    preferenceQueue = preferenceQueue.catch(() => {}).then(() => window.HubSession.saveSetting('en-route', value)).catch(() => {
+      setConnection('La sélection n’a pas pu être synchronisée. Choisis de nouveau ton arrêt pour réessayer.');
+    });
+  }, 400);
 };
 
 async function api(action, params = {}, { signal, body } = {}) {
@@ -29,9 +35,10 @@ async function api(action, params = {}, { signal, body } = {}) {
   else signal?.addEventListener('abort', abort, { once: true });
   const timer = setTimeout(abort, action === 'traffic' ? 85000 : 30000);
   try {
-    const response = await fetch(url, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : { Accept: 'application/json' }, body: body ? JSON.stringify(body) : undefined, signal: controller.signal, cache: 'no-store', credentials: 'same-origin' });
+    const response = await fetch(url, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json', 'X-Hub-CSRF': window.HubSession.csrf } : { Accept: 'application/json' }, body: body ? JSON.stringify(body) : undefined, signal: controller.signal, cache: 'no-store', credentials: 'same-origin' });
     let payload;
     try { payload = await response.json(); } catch { throw new Error('Le serveur ne renvoie pas de données exploitables.'); }
+    if (response.status === 401) { location.replace(new URL('login.php?next=' + encodeURIComponent(location.pathname), window.HubSession.base)); throw new Error('Connecte-toi pour continuer.'); }
     if (!response.ok) {
       const error = new Error(payload.error || 'La recherche est indisponible pour le moment.');
       error.code = payload.code;
@@ -200,7 +207,7 @@ async function loadStops(preferred) {
   state.stops = [];
   drawTimes();
   options($('#stop'), [], '', 'Recherche des arrêts…');
-  remember();
+  if (!preferred) remember();
   $('#passages').setAttribute('aria-busy', 'false');
   $('.mt-messages').setAttribute('aria-busy', 'false');
   setSelectionTitle();
@@ -484,4 +491,8 @@ function updateClock() {
 }
 updateClock();
 setInterval(updateClock, 60000);
-connect().catch(error => { setConnection(error.message); $('#traffic-state').textContent = 'Les informations réseau ne peuvent pas être chargées.'; $('.mt-traffic').setAttribute('aria-busy', 'false'); $('#departure-state').textContent = error.message; });
+(async () => {
+  const account = await window.HubSession.ready;
+  preferences = account.settings['en-route'] || {};
+  await connect();
+})().catch(error => { setConnection(error.message); $('#traffic-state').textContent = 'Les informations réseau ne peuvent pas être chargées.'; $('.mt-traffic').setAttribute('aria-busy', 'false'); $('#departure-state').textContent = error.message; });

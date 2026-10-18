@@ -1,5 +1,7 @@
 # Tempo — installation sur OVH Starter
 
+Avant une première mise en ligne, suis aussi `../../auth/LISEZ-MOI.md` et importe le schéma commun.
+
 Tempo utilise PHP 8.1 minimum (8.3 recommandé), PDO MySQL et une base MySQL/MariaDB.
 Il n’y a aucun outil de compilation à lancer sur OVH. Le premier carnet du hub ouvre `projets/tempo/`.
 
@@ -58,7 +60,7 @@ Les changements d’un autre appareil sont relus au retour sur la page et toutes
 lorsque l’onglet est visible. Une modification n’est affichée comme enregistrée qu’après confirmation
 du serveur. Pendant la sauvegarde, les clics supplémentaires sont bloqués. En cas de perte de connexion, le jour garde son état précédent et un message indique l’erreur : réessaie après reconnexion.
 
-## Données et futur login
+## Données par compte connecté
 
 - Le calendrier affiche le mois courant et les 12 mois précédents. Les jours futurs restent désactivés.
 - Le sélecteur permet aussi de consulter les années précédentes. Le nombre de jours de sport
@@ -68,11 +70,9 @@ du serveur. Pendant la sauvegarde, les clics supplémentaires sont bloqués. En 
 - Le fil relie les semaines civiles consécutives (lundi à dimanche) comportant au moins 3 jours de sport, quels que soient les jours choisis. Une semaine en cours ne rompt pas la série précédente avant sa fin. La meilleure série privilégie le nombre de semaines, puis les jours de sport en cas d’égalité.
 - La durée totale couvre les semaines validées, du lundi au dimanche (jusqu’à aujourd’hui pour une semaine en cours déjà validée). Les repos de ces semaines sont légèrement teintés ; les journées futures ne le sont pas.
 - Le record utilise tout l’historique, même les dates qui ne sont plus dans le calendrier.
-- Les données sont associées côté serveur à `user_id = 1`. Le futur login du hub remplacera
-  uniquement `currentUserId()` dans `api.php` par l’identifiant de la session.
+- Les données sont associées à l’identifiant de la session du hub. Le compte propriétaire **id = 1** conserve les anciennes séances ; un nouveau compte commence sans séance.
 
-À ce stade, il n’y a pas d’authentification : toute personne ayant accès à cette page peut consulter
-et modifier le même calendrier. La protection de session contre les écritures intersites ne remplace pas un login.
+La page et son API exigent désormais une connexion au hub. Le navigateur ne choisit jamais le compte auquel une séance appartient. Voir `../../auth/LISEZ-MOI.md` pour installer la connexion et créer les comptes.
 
 Pour sauvegarder tes données, exporte régulièrement la table `tempo_sport_days` depuis phpMyAdmin.
 Les fichiers du site et la base doivent être sauvegardés séparément.

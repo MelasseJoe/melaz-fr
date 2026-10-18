@@ -12,12 +12,9 @@ function respond(int $status, array $body): never
     exit;
 }
 
-function currentUserId(): int
-{
-    // Le futur login du hub fournira ici l'identifiant de sa session.
-    // Aucune valeur user_id transmise par le navigateur n'est utilisée.
-    return 1;
-}
+require dirname(__DIR__, 2) . '/auth/lib.php';
+$user = HubAuth\requireUser();
+$userId = $user['id'];
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 if (!in_array($method, ['GET', 'POST'], true)) {
@@ -25,20 +22,7 @@ if (!in_array($method, ['GET', 'POST'], true)) {
     respond(405, ['error' => 'Méthode non autorisée.']);
 }
 
-// La session protège les écritures contre les requêtes intersites ; ce n'est pas un login.
-$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
-session_name('tempo_session');
-session_set_cookie_params([
-    'lifetime' => 0, 'path' => '/', 'secure' => $secure,
-    'httponly' => true, 'samesite' => 'Strict',
-]);
-if (!session_start()) {
-    respond(503, ['error' => 'La session du serveur est indisponible.']);
-}
-if (!isset($_SESSION['tempo_csrf'])) {
-    $_SESSION['tempo_csrf'] = bin2hex(random_bytes(32));
-}
-$csrf = $_SESSION['tempo_csrf'];
+$csrf = HubAuth\csrf();
 session_write_close();
 
 if ($method === 'POST') {
@@ -56,40 +40,9 @@ if ($method === 'POST') {
     }
 }
 
-$configPath = getenv('TEMPO_CONFIG') ?: dirname(__DIR__, 3) . '/tempo-config.php';
-if (!is_file($configPath)) {
-    $configPath = __DIR__ . '/config.php';
-}
-if (!is_file($configPath)) {
-    respond(503, ['error' => 'La base de données doit être configurée sur le serveur. Consulte le fichier LISEZ-MOI.md fourni avec Tempo.']);
-}
-
 try {
-    $config = require $configPath;
-    if (!is_array($config)) {
-        throw new RuntimeException('Invalid database configuration');
-    }
-    foreach (['host', 'database', 'username', 'password'] as $key) {
-        if (!isset($config[$key]) || !is_string($config[$key])) {
-            throw new RuntimeException('Missing database setting');
-        }
-    }
-    if (preg_match('/[;\x00-\x1f]/', $config['host'] . $config['database'])) {
-        throw new RuntimeException('Invalid database setting');
-    }
-    date_default_timezone_set($config['timezone'] ?? 'Europe/Paris');
-    $today = date('Y-m-d');
-    $port = (int) ($config['port'] ?? 3306);
-    if ($port < 1 || $port > 65535) {
-        throw new RuntimeException('Invalid database port');
-    }
-    $db = new PDO(
-        'mysql:host=' . $config['host'] . ';port=' . $port . ';dbname=' . $config['database'] . ';charset=utf8mb4',
-        $config['username'], $config['password'],
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false,
-         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_TIMEOUT => 10]
-    );
-    $userId = currentUserId();
+    $db = HubAuth\database();
+    $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Paris')))->format('Y-m-d');
 
     if ($method === 'GET') {
         // Toutes les dates restent disponibles pour le record, même hors des 13 mois affichés.
@@ -118,7 +71,9 @@ try {
     }
     if ($active) {
         // Idempotent : deux clics ou deux appareils ne créent pas de doublon.
-        $query = $db->prepare('INSERT INTO tempo_sport_days (user_id, sport_date) VALUES (?, ?) ON DUPLICATE KEY UPDATE sport_date = VALUES(sport_date)');
+        $sql = 'INSERT INTO tempo_sport_days (user_id, sport_date) VALUES (?, ?) ';
+        $sql .= $db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite' ? 'ON CONFLICT(user_id, sport_date) DO NOTHING' : 'ON DUPLICATE KEY UPDATE sport_date = VALUES(sport_date)';
+        $query = $db->prepare($sql);
     } else {
         $query = $db->prepare('DELETE FROM tempo_sport_days WHERE user_id = ? AND sport_date = ?');
     }
@@ -126,6 +81,6 @@ try {
     respond(200, ['date' => $date, 'active' => $active]);
 } catch (Throwable $exception) {
     // Le détail technique reste dans les journaux du serveur, jamais dans la réponse HTTP.
-    error_log('Tempo database error: ' . $exception->getMessage());
+    error_log('Tempo database error: ' . get_class($exception));
     respond(503, ['error' => 'La base de données est indisponible. Vérifie sa configuration et l’import du fichier schema.sql.']);
 }

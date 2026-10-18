@@ -1,4 +1,4 @@
-DirectoryIndex index.html
+DirectoryIndex index.php
 Options -Indexes
 <IfModule mod_mime.c>
     AddType text/javascript .js .mjs
@@ -13,3 +13,6 @@ Options -Indexes
     Header always set X-Content-Type-Options "nosniff"
     Header always set Referrer-Policy "same-origin"
 </IfModule>
+
+RewriteEngine On
+RewriteRule ^(?:index\.html)?$ index.php [L]

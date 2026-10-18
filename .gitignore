@@ -6,3 +6,5 @@
 **/*.sql
 # Historique personnel de sport : ne pas publier l'import sur GitHub.
 /imports/import-sport-2022-2026.sql
+
+**/hub-config.php

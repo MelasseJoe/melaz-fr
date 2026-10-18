@@ -1,7 +1,10 @@
-DirectoryIndex index.html
+DirectoryIndex index.php
 Options -Indexes
 AddType application/javascript .mjs
 
 <FilesMatch "^(config(?:\.example)?\.php|schema\.sql|LISEZ-MOI\.md)$">
     Require all denied
 </FilesMatch>
+
+RewriteEngine On
+RewriteRule ^(?:index\.html)?$ index.php [L]
