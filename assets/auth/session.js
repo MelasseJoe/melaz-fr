@@ -49,7 +49,7 @@
   document.addEventListener('visibilitychange', async () => {
     if (document.hidden || !identity || checking) return;
     checking = true;
-    try { const data = await request('me'); if (!data.user) login(); else if (data.user.id !== identity.id) location.reload(); }
+    try { const data = await request('me'); if (!data.user) login(); else if (data.user.id !== identity.id || data.csrf !== csrf) location.reload(); }
     catch { /* Les prochains appels affichent leurs propres erreurs réseau. */ }
     finally { checking = false; }
   });

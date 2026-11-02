@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace HubAuth;
+require_once __DIR__ . "/remember.php";
 
 final class AuthError extends \RuntimeException
 {
@@ -58,7 +59,7 @@ function checkCsrf(?string $token): void
 }
 function clearIdentity(): void
 {
-    unset($_SESSION['hub_user'], $_SESSION['tempo_csrf']);
+    unset($_SESSION['hub_user'], $_SESSION['hub_remember'], $_SESSION['tempo_csrf']);
     $_SESSION['hub_csrf'] = bin2hex(random_bytes(32));
 }
 function passwordMatches(string $password, string $hash): bool
@@ -76,6 +77,7 @@ function passwordMatches(string $password, string $hash): bool
 final class Accounts
 {
     public function __construct(private \PDO $db) {}
+    public function tokens(): RememberTokens { return new RememberTokens($this->db); }
     public function user(int $id): ?array
     {
         $q = $this->db->prepare('SELECT id, username, display_name, active, auth_version FROM hub_users WHERE id = ?');
@@ -131,12 +133,37 @@ final class Accounts
 function currentUser(?Accounts $accounts = null): ?array
 {
     startSession(); $session = $_SESSION['hub_user'] ?? null;
-    if (!is_array($session)) return null;
     $now = time();
-    if ($now - ($session['seen'] ?? 0) > 43200 || $now - ($session['created'] ?? 0) > 604800) { clearIdentity(); return null; }
-    $user = ($accounts ?? new Accounts(database()))->user((int) ($session['id'] ?? 0));
-    if (!$user || (int) $user['auth_version'] !== (int) ($session['version'] ?? 0)) { clearIdentity(); return null; }
-    $_SESSION['hub_user']['seen'] = $now;
+    if (is_array($session)) {
+        $accounts ??= new Accounts(database());
+        if ($now - ($session['seen'] ?? 0) > 43200 || $now - ($session['created'] ?? 0) > 604800) {
+            clearIdentity();
+        } else {
+            $user = $accounts->user((int) ($session['id'] ?? 0));
+            $tokens = $accounts->tokens();
+            $selector = $_SESSION['hub_remember'] ?? null;
+            if (!$user || (int) $user['auth_version'] !== (int) ($session['version'] ?? 0) || (is_string($selector) && !$tokens->sessionValid($selector, (int) $user['id'], (int) $user['auth_version']))) {
+                if (is_string($selector)) $tokens->revoke($selector, (int) ($session['id'] ?? 0));
+                clearIdentity(); rememberCookie(); return null;
+            }
+            // Les sessions déjà ouvertes reçoivent aussi leur cookie persistant.
+            if (!is_string($selector)) rememberDevice($user, $tokens);
+            $_SESSION['hub_user']['seen'] = $now;
+            return publicUser($user);
+        }
+    }
+    if (!isset($_COOKIE['melaz_remember'])) return null;
+    if (!RememberTokens::parts($_COOKIE['melaz_remember'])) { rememberCookie(); return null; }
+    $accounts ??= new Accounts(database());
+    $result = $accounts->tokens()->recover($_COOKIE['melaz_remember'], $accounts);
+    if (!$result) { rememberCookie(); return null; }
+    establish($result['user']);
+    $_SESSION['hub_remember'] = $result['selector'];
+    if ($result['value'] !== null) rememberCookie($result['value'], $result['expires']);
+    return publicUser($result['user']);
+}
+function publicUser(array $user): array
+{
     return ['id' => (int) $user['id'], 'username' => $user['username'], 'displayName' => $user['display_name']];
 }
 function establish(array $user): void

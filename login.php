@@ -13,11 +13,19 @@ session_write_close();
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#e9e5d9">
   <meta name="robots" content="noindex,nofollow">
   <title>Votre prochaine idée. — Connexion</title>
   <link rel="icon" href="assets/favicon.jpg" type="image/jpeg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/pwa/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Melaz">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="stylesheet" href="assets/pwa.css?v=20261102-1">
+  <script defer src="assets/pwa.js?v=20261102-1"></script>
   <link rel="stylesheet" href="assets/fonts.css">
   <link rel="stylesheet" href="assets/auth/login.css?v=20261018-auth-1">
   <script defer src="assets/auth/login.js?v=20261018-auth-1"></script>

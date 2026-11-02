@@ -55,3 +55,11 @@ utilise PHP et MySQL, importe `projets/tempo/schema.sql`, configure `projets/tem
 puis lance `php -S localhost:8000 -t .` depuis ce dossier.
 
 Le site suit le thème clair/sombre du système. Il adapte la grille aux petits écrans et respecte le réglage de réduction des animations. Les carnets sont accessibles au clavier ; les emplacements à venir s’ouvrent dans une fenêtre fermable avec Échap.
+
+## Connexion conservée entre les visites
+
+La connexion est désormais conservée 30 jours par navigateur. Pour mettre à jour une installation existante, importe d’abord `auth/migrations/20261102-connexion-persistante.sql` dans phpMyAdmin, puis déploie les fichiers à jour. Les comptes et séances existants sont conservés. Voir `auth/LISEZ-MOI.md`.
+
+## Application iPhone (PWA)
+
+Melaz peut être ajouté à l’écran d’accueil de l’iPhone depuis Safari. Déploie aussi `manifest.webmanifest`, `sw.js`, `offline.html` et les ressources `assets/pwa*`, puis suis `INSTALLATION-IPHONE.md`. Le mode hors connexion ne conserve que la page publique de repli et les icônes ; les données des comptes et les horaires restent en ligne.

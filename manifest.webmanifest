@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "Melaz — Mes projets",
+  "short_name": "Melaz",
+  "description": "Mes projets personnels : Tempo et Entre deux rames.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eee9dc",
+  "theme_color": "#eee9dc",
+  "icons": [
+    { "src": "assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

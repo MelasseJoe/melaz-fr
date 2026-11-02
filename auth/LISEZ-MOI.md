@@ -12,6 +12,23 @@ La page de connexion est `login.php`. Le hub, Tempo et Entre deux rames utilisen
 
 Le serveur charge `index.php` et protège aussi les anciennes adresses `index.html`. Les feuilles HTML restent dans le dossier pour faciliter leur édition ; elles ne doivent pas être servies en contournant les règles `.htaccess`.
 
+## Activer la connexion persistante sur une installation existante
+
+1. Dans phpMyAdmin, sélectionne la base utilisée par le hub et importe **`auth/migrations/20261102-connexion-persistante.sql`**. Cette migration ajoute seulement `hub_remember_tokens` : elle ne change ni les comptes, ni les mots de passe, ni les séances.
+2. Déploie la version à jour du dossier `hub-projet`, y compris le dossier `auth` et ses fichiers cachés. Pour une nouvelle installation, le schéma complet `auth/schema.sql` inclut déjà cette table.
+3. Les sessions encore ouvertes reçoivent automatiquement le nouveau cookie à leur prochaine visite. Une personne déjà déconnectée doit saisir son mot de passe une dernière fois.
+
+La connexion est conservée automatiquement **30 jours sur chaque navigateur**, à compter de sa dernière connexion par mot de passe (ou de l’activation pour une session déjà ouverte). La fermeture du navigateur ou l’expiration du fichier de session PHP ne demandent plus de ressaisir le mot de passe pendant cette durée. L’échéance des 30 jours ne se prolonge pas à chaque visite.
+
+- **Déconnexion** : le cookie et le jeton du navigateur concerné sont supprimés ; ses anciens jetons ne peuvent plus reconnecter le compte. Les autres appareils restent connectés.
+- **Désactivation ou changement de `auth_version`** : les sessions et les jetons persistants du compte sont refusés. Pour un changement de mot de passe, augmente toujours `auth_version` comme indiqué ci-dessous.
+- **Révocation manuelle d’un appareil** : supprime sa ligne dans `hub_remember_tokens`. Pour déconnecter tous les appareils d’un utilisateur, augmente son `auth_version` de 1.
+- **Suppression des cookies / navigation privée** : une nouvelle connexion pourra être nécessaire.
+
+Le cookie `melaz_remember` est HTTP-only, SameSite=Lax, Secure en HTTPS, avec une expiration de 30 jours. Il ne contient ni mot de passe ni clé API. Son secret aléatoire est haché en base et renouvelé quand il recrée une session. Une grâce de 30 secondes gère les ouvertures simultanées de plusieurs onglets, sans écraser le nouveau cookie. Les jetons expirés sont nettoyés lors de l’émission de nouveaux jetons.
+
+Les fichiers SQL restent locaux et exclus de GitHub. La base OVH n’est pas modifiée automatiquement par le code : importe la migration **avant** de déployer cette version.
+
 ## Créer le propriétaire à la main
 
 ### Préparer le mot de passe
@@ -51,7 +68,7 @@ Pour un **autre utilisateur**, insère une nouvelle ligne en laissant `id` vide 
 - **Entre deux rames** sauvegarde la dernière ligne et le dernier arrêt dans `hub_user_settings`, par compte. Le choix est restauré sur les autres appareils au prochain chargement de la page. Les anciennes préférences locales anonymes ne sont pas attribuées à un nouveau compte.
 - Les données publiques PRIM (passages, perturbations, itinéraires) sont partagées ; les choix personnels ne le sont pas. La clé PRIM reste côté serveur dans `en-route-config.php`.
 - Le hub affiche le nom du compte et propose la déconnexion sur chaque page. Les cartes de projet sont communes à tous les comptes.
-- Session en cookie HTTP-only, SameSite=Lax, Secure en HTTPS ; identifiant renouvelé à la connexion, CSRF pour les écritures, expiration après 12 h d’inactivité (et 7 jours maximum). Fermer le navigateur peut terminer la session.
+- Session en cookie HTTP-only, SameSite=Lax, Secure en HTTPS ; identifiant renouvelé à la connexion, CSRF pour les écritures, expiration de la session courte après 12 h d’inactivité (et 7 jours maximum), puis restauration automatique par le cookie persistant tant que ses 30 jours ne sont pas écoulés.
 - Limitation : 8 tentatives par identifiant/adresse IP et 40 par IP dans une fenêtre de 15 minutes. Les empreintes techniques expirées sont nettoyées ; les mots de passe et adresses IP brutes ne sont pas enregistrés dans cette table.
 
 Les fichiers `hub-config.php`, `tempo-config.php`, `en-route-config.php`, les caches et les fichiers SQL sont ignorés par Git. `auth/schema.sql` est un schéma vierge local, distinct de ton import historique personnel. Les accès HTTP aux fichiers SQL et aux configurations sont refusés. Les outils `tools/password-hash.*` restent hors du dossier déployable.

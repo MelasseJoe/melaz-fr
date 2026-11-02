@@ -29,10 +29,12 @@ try {
         session_write_close();
         $account = (new HubAuth\Accounts(HubAuth\database()))->authenticate($input['username'], $input['password'], $_SERVER['REMOTE_ADDR'] ?? 'unknown');
         HubAuth\establish($account);
+        HubAuth\rememberDevice($account, (new HubAuth\Accounts(HubAuth\database()))->tokens());
         reply(200, ['next' => HubAuth\nextPath($input['next'] ?? null)]);
     }
     $user = HubAuth\requireUser();
     if ($action === 'logout') {
+        HubAuth\forgetDevice($user, (new HubAuth\Accounts(HubAuth\database()))->tokens());
         $_SESSION = []; $params = session_get_cookie_params();
         setcookie(session_name(), '', ['expires' => time() - 42000, 'path' => $params['path'], 'secure' => $params['secure'], 'httponly' => true, 'samesite' => 'Lax']);
         session_destroy(); reply(200, ['ok' => true]);
