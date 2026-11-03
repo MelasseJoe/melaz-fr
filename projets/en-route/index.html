@@ -18,8 +18,8 @@
   <link rel="stylesheet" href="../../assets/fonts.css">
   <link rel="stylesheet" href="../../assets/auth/session.css?v=20261018-auth-1">
   <script defer src="../../assets/auth/session.js?v=20261102-remember-1"></script>
-  <link rel="stylesheet" href="styles.css?v=20261018-2">
-  <script type="module" src="app.js?v=20261018-auth-1"></script>
+  <link rel="stylesheet" href="styles.css?v=20261103-favorites-1">
+  <script type="module" src="app.js?v=20261103-favorites-1"></script>
 </head>
 <body id="en-route">
 <main class="mt-app" data-palette="lin" data-layout="composte">
@@ -45,6 +45,18 @@
     <h1>Un billet pour<br>les prochaines minutes.</h1>
     <p id="connection-state" class="connection-state" role="status" hidden></p>
   </div>
+
+  <section id="favorites" class="mt-favorites" aria-labelledby="favorites-title">
+    <div class="mt-section-head"><h2 id="favorites-title">Mes lignes favorites</h2><button id="manage-favorites" class="quiet-button" type="button" aria-expanded="false" aria-controls="favorite-editor" disabled>Modifier mes favoris</button></div>
+    <form id="favorite-editor" class="favorite-editor" hidden>
+      <p class="favorite-help">Jusqu’à trois lignes de métro, un arrêt par ligne. Les deux sens sont affichés.</p>
+      <div id="favorite-fields"></div>
+      <div class="favorite-actions"><button id="save-favorites" class="quiet-button" type="submit">Enregistrer</button><button id="cancel-favorites" class="quiet-button" type="button">Annuler</button></div>
+    </form>
+    <p id="favorite-status" class="favorite-status" role="status"></p>
+    <div id="favorite-tabs" class="favorite-tabs" role="tablist" aria-label="Mes lignes favorites"></div>
+    <div id="favorite-panel" class="favorite-panel" role="tabpanel" tabindex="0"><p class="favorite-empty">Chargement de vos favoris…</p></div>
+  </section>
 
   <div class="mt-workspace">
     <article class="mt-departures" aria-labelledby="departures-title">

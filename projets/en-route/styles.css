@@ -194,3 +194,27 @@ body{margin:0;background:light-dark(#e9e3da,#282522)}
 #en-route .mt-top{min-height:34px;padding-bottom:10px;margin-bottom:14px}
 @media(min-width:1360px){#en-route .mt-app{padding-top:24px}}
 @media(max-width:650px){#en-route .mt-app{padding-top:14px}}
+
+/* Les favoris reprennent le papier, les filets et les caractères des billets existants. */
+#en-route .mt-favorites{position:relative;background:var(--mt-surface);border-radius:var(--mt-radius);padding:24px;margin-bottom:var(--mt-space);min-width:0;box-shadow:0 3px 0 color-mix(in srgb,var(--mt-ink) 8%,transparent)}
+#en-route .mt-favorites:before{content:'';position:absolute;inset:6px;border:1px solid var(--mt-line);border-radius:var(--mt-radius);pointer-events:none}
+#en-route .mt-favorites .mt-section-head{align-items:center;margin-bottom:16px}
+#en-route .favorite-tabs{display:flex;gap:12px;border-bottom:1px dashed var(--mt-line);margin-bottom:22px}
+#en-route .favorite-tabs:empty{display:none}
+#en-route .favorite-tab{display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:12px 10px;border:0;border-bottom:2px solid transparent;background:none;text-align:left;cursor:pointer}
+#en-route .favorite-tab>span:last-child{overflow-wrap:anywhere;font:500 14px/1.4 'DM Sans',sans-serif}
+#en-route .favorite-tab[aria-selected="true"]{border-bottom-color:var(--mt-accent);background:var(--mt-soft)}
+#en-route .favorite-tab[aria-selected="false"]{color:var(--mt-muted)}
+#en-route .favorite-times{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:20px 0}
+#en-route .favorite-times .direction-passages+.direction-passages{margin-top:0;padding-top:0;border-top:0;border-left:1px dashed var(--mt-line);padding-left:24px}
+#en-route .favorite-panel{min-width:0}
+#en-route .favorite-empty,#en-route .favorite-help{color:var(--mt-muted);font-size:12px}
+#en-route .favorite-status{min-height:22px;color:var(--mt-muted);font-size:11px;margin-bottom:10px}
+#en-route .favorite-editor{padding:4px 0 20px;margin-bottom:14px;border-bottom:1px dashed var(--mt-line)}
+#en-route .favorite-edit-row{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px 14px;margin-top:15px}
+#en-route .favorite-row-error{grid-column:1/-1;font-size:11px;color:var(--mt-muted)}
+#en-route .favorite-row-error:empty{display:none}
+#en-route .favorite-actions{display:flex;gap:24px;margin-top:18px}
+#en-route .favorite-traffic-label{color:var(--mt-accent)!important}
+@media(max-width:850px){#en-route .favorite-times{grid-template-columns:1fr}#en-route .favorite-times .direction-passages+.direction-passages{border-left:0;padding-left:0;border-top:1px dashed var(--mt-line);padding-top:20px}}
+@media(max-width:650px){#en-route .mt-favorites{padding:22px}#en-route .favorite-tabs{gap:5px}#en-route .favorite-tab{flex-direction:column;align-items:center;text-align:center;padding:12px 4px;gap:8px}#en-route .favorite-tab>span:last-child{font-size:12px}#en-route .favorite-edit-row{grid-template-columns:80px minmax(0,1fr)}#en-route .favorite-times .mt-counts{gap:12px}#en-route .favorite-times .mt-following{gap:12px}}

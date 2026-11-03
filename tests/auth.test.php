@@ -30,6 +30,18 @@ check($accounts->settings(1)['en-route']['line'] === 'line:IDFM:C01384', 'écrit
 $accounts->saveSettings(1,'en-route',['line'=>'line:IDFM:C01384','stop'=>'','user_id'=>2]);
 check($accounts->settings(2)['en-route']['line'] === 'line:IDFM:C01371', 'identifiant de compte envoyé dans les préférences ignoré');
 try { $accounts->saveSettings(1,'en-route',['line'=>'javascript:evil','stop'=>'']); check(false,'injection'); } catch (HubAuth\AuthError $e) { check($e->status === 422,'sélection de transport invalide refusée'); }
+$favoriteDays = [['line'=>'line:IDFM:C01384','stop'=>'stop_area:IDFM:71324'],['line'=>'line:IDFM:C01371','stop'=>'stop_area:IDFM:70001'],['line'=>'line:IDFM:C01376','stop'=>'stop_area:IDFM:70002']];
+$accounts->saveSettings(1,'en-route',['favorites'=>$favoriteDays]);
+check($accounts->settings(1)['en-route']['favorites'] === $favoriteDays, 'trois lignes favorites sauvegardées pour le propriétaire');
+check($accounts->settings(2)['en-route']['favorites'] === [], 'favoris isolés entre utilisateurs');
+$accounts->saveSettings(1,'en-route',['line'=>'line:IDFM:C01384','stop'=>'stop_area:IDFM:71324']);
+check($accounts->settings(1)['en-route']['favorites'] === $favoriteDays, 'une recherche de passage conserve les favoris');
+$accounts->saveSettings(1,'en-route',['favorites'=>[]]);
+check($accounts->settings(1)['en-route']['stop'] === 'stop_area:IDFM:71324' && $accounts->settings(1)['en-route']['favorites'] === [], 'supprimer les favoris conserve la recherche');
+foreach ([null, 'invalid', array_merge($favoriteDays, [$favoriteDays[0]]), [$favoriteDays[0],$favoriteDays[0]], [['line'=>'line:IDFM:C01384','stop'=>'']], [['line'=>'javascript:evil','stop'=>'stop_area:IDFM:70001']]] as $invalid) {
+    try { $accounts->saveSettings(1,'en-route',['favorites'=>$invalid]); check(false,'favoris invalides'); }
+    catch (HubAuth\AuthError $e) { check($e->status === 422, 'favoris incomplets, doublons, plus de trois ou format invalide refusés'); }
+}
 $salt = random_bytes(16);
 $pbkdf = 'pbkdf2-sha256$600000$' . base64_encode($salt) . '$' . base64_encode(hash_pbkdf2('sha256',$password,$salt,600000,32,true));
 check(HubAuth\passwordMatches($password,$pbkdf) && !HubAuth\passwordMatches('incorrect',$pbkdf),'empreinte de l’outil hors ligne compatible avec PHP');

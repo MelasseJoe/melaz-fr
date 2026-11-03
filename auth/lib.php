@@ -121,9 +121,21 @@ final class Accounts
     public function saveSettings(int $id, string $namespace, array $settings): array
     {
         if ($namespace !== 'en-route') throw new AuthError('Préférence inconnue.', 422);
-        $line = $settings['line'] ?? ''; $stop = $settings['stop'] ?? '';
+        $previous = $this->settings($id)[$namespace] ?? [];
+        $line = $settings['line'] ?? $previous['line'] ?? ''; $stop = $settings['stop'] ?? $previous['stop'] ?? '';
         if (!is_string($line) || !is_string($stop) || !preg_match('/^(?:line:IDFM:C\d+)?$/D', $line) || !preg_match('/^(?:stop_(?:area|point):IDFM:[a-zA-Z0-9:_-]{1,120})?$/D', $stop) || ($line === '' && $stop !== '')) throw new AuthError('La sélection de transport est invalide.', 422);
-        $value = ['line' => $line, 'stop' => $stop];
+        $favorites = array_key_exists('favorites', $settings) ? $settings['favorites'] : ($previous['favorites'] ?? []);
+        if (!is_array($favorites) || !array_is_list($favorites) || count($favorites) > 3) throw new AuthError('Choisis trois lignes favorites au maximum.', 422);
+        $clean = []; $seen = [];
+        foreach ($favorites as $favorite) {
+            if (!is_array($favorite) || !is_string($favorite['line'] ?? null) || !is_string($favorite['stop'] ?? null)
+                || !preg_match('/^line:IDFM:C\d+$/D', $favorite['line'])
+                || !preg_match('/^stop_(?:area|point):IDFM:[a-zA-Z0-9:_-]{1,120}$/D', $favorite['stop'])
+                || isset($seen[$favorite['line']])) throw new AuthError('Chaque favori doit associer une ligne différente à un arrêt valide.', 422);
+            $seen[$favorite['line']] = true;
+            $clean[] = ['line' => $favorite['line'], 'stop' => $favorite['stop']];
+        }
+        $value = ['line' => $line, 'stop' => $stop, 'favorites' => $clean];
         $sql = 'INSERT INTO hub_user_settings (user_id, namespace, settings_json) VALUES (?, ?, ?) ';
         $sql .= $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'sqlite' ? 'ON CONFLICT(user_id, namespace) DO UPDATE SET settings_json = excluded.settings_json' : 'ON DUPLICATE KEY UPDATE settings_json = VALUES(settings_json)';
         $this->db->prepare($sql)->execute([$id, $namespace, json_encode($value, JSON_THROW_ON_ERROR)]);

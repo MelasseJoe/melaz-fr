@@ -1,3 +1,4 @@
+import { Favorites, prioritizeDisruptions } from './favorites.js?v=20261103-1';
 const $ = selector => document.querySelector(selector);
 const element = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -10,14 +11,14 @@ const duration = seconds => {
   const minutes = Math.max(1, Math.ceil(seconds / 60));
   return minutes >= 60 ? `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, '0')}` : `${minutes} min`;
 };
-const state = { configured: false, lines: [], stops: [], data: null, lineSequence: 0, selectionSequence: 0, controller: null, lastTraffic: 0, lastMessages: 0, refreshing: false };
+const state = { configured: false, lines: [], stops: [], data: null, lineSequence: 0, selectionSequence: 0, controller: null, traffic: null, lastTraffic: 0, lastMessages: 0, refreshing: false };
 let preferences = {};
 let preferenceTimer = null;
 let preferenceQueue = Promise.resolve();
 const remember = () => {
-  preferences = { line: $('#line').value, stop: $('#stop').value };
+  preferences = { ...preferences, line: $('#line').value, stop: $('#stop').value };
   clearTimeout(preferenceTimer);
-  const value = { ...preferences };
+  const value = { line: preferences.line, stop: preferences.stop };
   preferenceTimer = setTimeout(() => {
     preferenceQueue = preferenceQueue.catch(() => {}).then(() => window.HubSession.saveSetting('en-route', value)).catch(() => {
       setConnection('La sélection n’a pas pu être synchronisée. Choisis de nouveau ton arrêt pour réessayer.');
@@ -96,13 +97,12 @@ function setSelectionTitle() {
   $('#station-name').textContent = state.stops.find(stop => stop.id === $('#stop').value)?.name || 'Votre prochain métro';
 }
 
-function drawTimes() {
-  const container = $('#departure-times');
+function drawTimes(data = state.data, container = $('#departure-times')) {
   container.replaceChildren();
   const now = Date.now();
-  const recorded = state.data?.recordedAt || state.data?.updatedAt;
+  const recorded = data?.recordedAt || data?.updatedAt;
   const old = recorded && now - new Date(recorded).getTime() > 300000;
-  const groups = state.data?.directions || [];
+  const groups = data?.directions || [];
   groups.forEach(group => {
     const section = element('section', 'direction-passages');
     section.setAttribute('aria-label', `Direction ${group.name}`);
@@ -130,6 +130,7 @@ function drawTimes() {
     section.append(element('p', 'direction-note', note));
     container.append(section);
   });
+  if (container !== $('#departure-times')) return;
   $('#direction-name').textContent = groups.length ? 'Prochains passages · tous les sens' : 'Choisissez une ligne et un arrêt.';
   const notes = [];
   if (state.data && !groups.length) notes.push('Aucun prochain passage communiqué pour cette station.');
@@ -243,14 +244,13 @@ async function loadStops(preferred) {
   }
 }
 
-async function loadTraffic() {
-  $('.mt-traffic').setAttribute('aria-busy', 'true');
+function drawTraffic() {
+  const data = state.traffic;
+  if (!data) return;
   const open = new Set([...$('.mt-traffic').querySelectorAll('details[data-id][open]')].map(item => item.dataset.id));
-  try {
-    const data = await api('traffic');
     $('#traffic-list').replaceChildren();
     $('#traffic-rest').replaceChildren();
-    data.disruptions.forEach((item, index) => {
+    prioritizeDisruptions(data.disruptions, favorites.items).forEach((item, index) => {
       const detail = element('details', 'mt-alert');
       detail.dataset.id = item.id;
       detail.open = open.has(item.id);
@@ -268,6 +268,7 @@ async function loadTraffic() {
       if (!item.lines.length) badges.append(lineBadge('Info'));
       const copy = element('span');
       copy.append(element('strong', '', item.title), element('small', '', item.scope || 'Informations réseau'));
+      if (item.lines.some(line => favorites.items.some(favorite => favorite.line === line.id))) copy.append(element('small', 'favorite-traffic-label', '★ Ligne favorite'));
       const plus = element('span', '', '+');
       plus.setAttribute('aria-hidden', 'true');
       summary.append(badges, copy, plus);
@@ -281,6 +282,14 @@ async function loadTraffic() {
     $('#traffic-title').textContent = `Perturbations en cours${data.disruptions.length ? ' · ' + data.disruptions.length : ''}`;
     $('#traffic-state').textContent = data.disruptions.length ? '' : 'Aucune perturbation en cours signalée dans les données reçues.';
     $('#traffic-update').textContent = `Métro & RER · relevé ${clock(data.updatedAt)}`;
+}
+
+async function loadTraffic() {
+  $('.mt-traffic').setAttribute('aria-busy', 'true');
+  try {
+    const data = await api('traffic');
+    state.traffic = data;
+    drawTraffic();
     state.lastTraffic = Date.now();
   } catch (error) {
     $('#traffic-list').replaceChildren();
@@ -290,6 +299,19 @@ async function loadTraffic() {
     $('#traffic-update').textContent = 'Métro & RER · données indisponibles';
   } finally { $('.mt-traffic').setAttribute('aria-busy', 'false'); }
 }
+
+const favorites = new Favorites({
+  api, element, badge: lineBadge, drawTimes,
+  save: async items => {
+    clearTimeout(preferenceTimer);
+    const selection = { line: $('#line').value, stop: $('#stop').value };
+    const operation = preferenceQueue.catch(() => {}).then(() => window.HubSession.saveSetting('en-route', { ...selection, favorites: items }));
+    preferenceQueue = operation;
+    const value = await operation;
+    preferences = { ...preferences, favorites: value.favorites };
+  },
+  onChange: drawTraffic,
+});
 
 const fields = {};
 function setupPlaceField(name) {
@@ -436,6 +458,7 @@ function disconnected() {
   $('#departure-state').textContent = 'Les prochains passages seront disponibles après activation de la connexion.';
   $('#message-update').textContent = 'En attente de la connexion aux données.';
   $('#from-help').textContent = 'La recherche sera disponible une fois les données connectées.';
+  $('#favorite-panel').replaceChildren(element('p', 'favorite-empty', 'Vos favoris seront disponibles une fois la connexion PRIM activée.'));
 }
 
 async function connect() {
@@ -451,9 +474,12 @@ async function connect() {
     state.lines = data.lines;
     const initial = preferences.line || state.lines.find(line => line.code === '14')?.id;
     options($('#line'), state.lines.map(line => ({ ...line, name: line.code })), initial, 'Aucune ligne');
+    const favoriteLoad = favorites.start(state.lines, preferences.favorites);
     if ($('#line').value) await loadStops(preferences.stop);
     else $('#departure-state').textContent = 'Aucune ligne de métro n’a été communiquée.';
-  } catch (error) { setConnection(error.message); $('#departure-state').textContent = error.message; }
+    drawTraffic();
+    await favoriteLoad;
+  } catch (error) { setConnection(error.message); $('#departure-state').textContent = error.message; if (!state.lines.length) $('#favorite-panel').replaceChildren(element('p', 'favorite-empty', 'Les lignes favorites ne peuvent pas être chargées. Actualisez pour réessayer.')); }
   await traffic;
 }
 
@@ -465,24 +491,25 @@ $('#refresh').addEventListener('click', async () => {
   $('#refresh').disabled = true;
   try {
     if (!state.configured || !state.lines.length || !$('#stop').value) await connect();
-    else await Promise.allSettled([loadDepartures(state.selectionSequence, state.controller?.signal), loadMessages(state.selectionSequence, state.controller?.signal), loadTraffic()]);
+    else await Promise.allSettled([loadDepartures(state.selectionSequence, state.controller?.signal), loadMessages(state.selectionSequence, state.controller?.signal), loadTraffic(), favorites.refresh()]);
   } catch (error) { setConnection(error.message); }
   finally { state.refreshing = false; $('#refresh').disabled = false; }
 });
 
 let polling = false;
 async function poll() {
-  if (polling || document.hidden || !state.configured || !$('#stop').value) return;
+  if (polling || document.hidden || !state.configured) return;
   polling = true;
   try {
-    const requests = [loadDepartures(state.selectionSequence, state.controller?.signal)];
-    if (Date.now() - state.lastMessages > 180000) requests.push(loadMessages(state.selectionSequence, state.controller?.signal));
+    const requests = [favorites.refresh()];
+    if ($('#stop').value) requests.push(loadDepartures(state.selectionSequence, state.controller?.signal));
+    if ($('#stop').value && Date.now() - state.lastMessages > 180000) requests.push(loadMessages(state.selectionSequence, state.controller?.signal));
     if (Date.now() - state.lastTraffic > 300000) requests.push(loadTraffic());
     await Promise.allSettled(requests);
   } finally { polling = false; }
 }
 setInterval(poll, 65000);
-setInterval(() => { if (!document.hidden && state.data) drawTimes(); }, 15000);
+setInterval(() => { if (!document.hidden) { if (state.data) drawTimes(); favorites.render(); } }, 15000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
 function updateClock() {
   const now = new Date();

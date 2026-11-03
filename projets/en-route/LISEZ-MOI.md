@@ -77,3 +77,9 @@ La disponibilité et la couverture dépendent de PRIM et des transporteurs. Un r
 Les fichiers de configuration privés et `.en-route-cache` sont exclus par les `.gitignore`. Les SQL personnels existants restent exclus. Le cache peut contenir des recherches de lieux et de trajets : conserve-le hors de `www`. La connexion du hub est obligatoire pour cette page et son API. Les comptes partagent le budget PRIM, mais leurs préférences sont séparées.
 
 Les polices libres DM Serif Display et DM Mono sont incluses dans `assets`, avec leurs licences OFL. DM Sans est réutilisée depuis les ressources locales du hub. Aucun CDN, aucune compilation, aucune archive ZIP.
+
+## Lignes favorites
+
+Chaque compte peut enregistrer jusqu’à trois lignes de métro différentes, avec un arrêt par ligne. Les favoris apparaissent avant la recherche libre dans un billet à onglets ; chaque onglet affiche les prochains passages dans tous les sens communiqués par PRIM. Les favoris sont actualisés même sans arrêt sélectionné dans la recherche libre. Les perturbations qui concernent une ligne favorite sont classées en premier, puis l’ordre du réseau est conservé. Les autres perturbations restent accessibles.
+
+Les identifiants des lignes et arrêts sont sauvegardés dans les préférences `en-route` de `hub_user_settings`, avec la dernière recherche. Aucune migration SQL supplémentaire n’est nécessaire. La sauvegarde est propre à l’utilisateur connecté et partagée entre ses appareils. Les libellés et couleurs sont rechargés depuis PRIM, jamais acceptés depuis le navigateur.
