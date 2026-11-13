@@ -1,0 +1,83 @@
+// Exclusivement contre le serveur local isolé, jamais contre melaz.fr.
+import assert from 'node:assert/strict';
+import {randomBytes} from 'node:crypto';
+const base='http://127.0.0.1:8780';
+const client=()=>({cookies:new Map(),csrf:''});
+async function request(c,path,body,extra={}){
+ const response=await fetch(base+path,{method:body?'POST':'GET',redirect:'manual',headers:{Cookie:[...c.cookies].map(([k,v])=>`${k}=${v}`).join('; '),...(body?{'Content-Type':'application/json','X-Hub-CSRF':c.csrf}:{}),...extra},body:body?JSON.stringify(body):undefined});
+ for(const cookie of response.headers.getSetCookie()){const [name,...value]=cookie.split(';')[0].split('=');c.cookies.set(name,value.join('='));}
+ const data=(response.headers.get('content-type')||'').includes('application/json')?await response.json():await response.text();if(data.csrf)c.csrf=data.csrf;
+ return {status:response.status,data,headers:response.headers};
+}
+async function login(name){const c=client();await request(c,'/auth/api.php?action=me');assert.equal((await request(c,'/auth/api.php?action=login',{username:name,password:'Carnet-demo-2026!',next:'/projets/bibliotheque/'})).data.next,'/projets/bibliotheque/');await request(c,'/auth/api.php?action=me');return c;}
+const api='/projets/bibliotheque/api.php';
+assert.equal((await request(client(),api)).status,401);
+const redirect=await request(client(),'/projets/bibliotheque/');assert.equal(redirect.status,302);assert.match(redirect.headers.get('location'),/next=%2Fprojets%2Fbibliotheque%2F/);
+const a=await login('demo'),b=await login('second');
+assert.equal((await request(a,'/projets/bibliotheque/')).status,200);
+assert.equal((await request(client(),'/projets/bibliotheque/index.html')).status,302);
+const first=await request(a,api);assert.match(first.headers.get('cache-control'),/no-store/);
+const initialCount = first.data.books.length;
+assert.ok(initialCount > 0);
+const record={id:randomBytes(16).toString('hex'),title:'Livre test HTTP',author:'Auteur fictif',date:'2025-01-01',note:'Privé',coverId:null,workKey:null,editionKey:null,user_id:2};
+assert.equal((await request(a,api+'?action=create',record,{'X-Hub-CSRF':'bad'})).status,403);
+assert.equal((await request(a,api+'?action=create',record,{'Sec-Fetch-Site':'cross-site'})).status,403);
+assert.equal((await request(a,api+'?action=create',record,{'Content-Type':'text/plain'})).status,415);
+const created=await request(a,api+'?action=create',record);assert.equal(created.status,201);assert.equal(created.data.book.revision,1);
+assert.equal((await request(a,api+'?action=create',record)).status,201);
+assert.equal((await request(a,api)).data.books.length,initialCount + 1);
+assert.equal((await request(b,api)).data.books.length,0);
+const device=await login('demo');assert.ok((await request(device,api)).data.books.some(book=>book.id===record.id));
+const update={id:record.id,revision:1,date:'2025-02-01',note:'Depuis un autre appareil'};
+assert.equal((await request(device,api+'?action=update',update)).status,200);
+assert.equal((await request(a,api+'?action=update',update)).status,409);
+assert.equal((await request(b,api+'?action=update',update)).status,404);
+assert.equal((await request(b,api+'?action=delete',{id:record.id,revision:2})).status,404);
+assert.equal((await request(a,api+'?action=delete',{id:record.id,revision:2})).status,200);
+assert.equal((await request(a,api)).data.books.length,initialCount);
+assert.equal((await request(a,api+'?action=restore',{id:record.id,revision:3})).status,200);
+assert.equal((await request(device,api)).data.books.length,initialCount + 1);
+assert.equal((await request(a,api+'?action=delete',{id:record.id,revision:4})).status,200);
+const search=await request(a,api+'?action=search&q='+encodeURIComponent('La Papeterie Tsubaki'));
+assert.equal(search.status,200);assert.equal(search.data.books[0].title,'La Papeterie Tsubaki');assert.equal(search.data.books[0].coverId,11949744);
+assert.equal((await request(a,api+'?action=search&q=x')).status,422);
+assert.equal((await request(a,api+'?action=unknown')).status,404);
+const editionsPath = api + '?action=editions&work=' + encodeURIComponent('/works/OL24400450W');
+assert.equal((await request(client(),editionsPath)).status,401);
+assert.equal((await request(a,api+'?action=editions&work=https://evil.example')).status,422);
+assert.equal((await request(a,editionsPath+'&offset=-1')).status,422);
+const editionsReply = await request(a,editionsPath);
+assert.equal(editionsReply.status,200);
+assert.equal((await request(a,editionsPath+'&group=invalid')).status,422);
+const frenchReply = await request(a,editionsPath+'&group=fr');
+assert.equal(frenchReply.status,200);
+assert.ok(frenchReply.data.editions.every(edition=>edition.languages.includes('fre')));
+assert.equal(frenchReply.data.nextGroup,'other');
+assert.equal(frenchReply.data.nextOffset,0);
+const otherReply = await request(a,editionsPath+'&group=other');
+assert.equal(otherReply.status,200);
+assert.equal(otherReply.data.nextGroup,'other');
+const editions = [...editionsReply.data.editions];
+if (editionsReply.data.nextOffset !== null) {
+ const page = await request(a,editionsPath+'&offset='+editionsReply.data.nextOffset);
+ assert.equal(page.status,200);
+ editions.push(...page.data.editions);
+}
+const older = editions.find(edition=>edition.editionKey==='/books/OL32316184M');
+const newer = editions.find(edition=>edition.editionKey==='/books/OL33305374M');
+assert.equal(older.coverId,10940008);
+assert.equal(newer.coverId,11949744);
+const editionRecord = {id:randomBytes(16).toString('hex'),...older,author:'Ito Ogawa',date:'2025-01-01',note:'Souvenir conservé'};
+assert.equal((await request(a,api+'?action=create',editionRecord)).status,201);
+assert.equal((await request(device,api)).data.books.find(book=>book.id===editionRecord.id).editionKey,older.editionKey);
+const change = {id:editionRecord.id,revision:1,date:editionRecord.date,note:editionRecord.note,editionKey:newer.editionKey,coverId:newer.coverId,title:newer.title};
+assert.equal((await request(a,api+'?action=update',change,{'X-Hub-CSRF':'bad'})).status,403);
+assert.equal((await request(b,api+'?action=update',change)).status,404);
+assert.equal((await request(a,api+'?action=update',change)).status,200);
+const savedEdition = (await request(device,api)).data.books.find(book=>book.id===editionRecord.id);
+assert.equal(savedEdition.editionKey,newer.editionKey);
+assert.equal(savedEdition.coverId,newer.coverId);
+assert.equal(savedEdition.note,editionRecord.note);
+assert.equal((await request(a,api+'?action=delete',{id:editionRecord.id,revision:2})).status,200);
+console.log('PASS HTTP : connexion et redirection, pages protégées, CSRF, isolation entre comptes, persistance entre sessions, idempotence, conflits, retrait et restauration, recherche catalogue.');
+console.log('PASS HTTP : choix d’édition à l’ajout, pages d’éditions, couverture associée et modification persistante depuis une autre session.');

@@ -1,13 +1,14 @@
 # Hub projet — Mise en ligne
 
-Le hub utilise maintenant PHP et une connexion commune, sans compilation. Son premier carnet ouvre Tempo, le calendrier de sport ; le deuxième ouvre **Entre deux rames**, les prochains métros et itinéraires dans la palette Lin & café.
+Le hub utilise maintenant PHP et une connexion commune, sans compilation. Son premier carnet ouvre Tempo, le calendrier de sport ; le deuxième ouvre **Entre deux rames**, les prochains métros et itinéraires dans la palette Lin & café ; le troisième ouvre **Bibliothèque**, les livres terminés présentés sur des étagères en laiton dans une page bordeaux.
 Tempo nécessite PHP 8.1 minimum et une base MySQL/MariaDB pour sauvegarder les saisies entre appareils.
 Les étapes OVH Starter sont dans `projets/tempo/LISEZ-MOI.md`.
 Entre deux rames utilise PHP 8.1 et cURL pour les transports ; les préférences personnelles utilisent la base commune. Pour ajouter ta clé PRIM, suis `projets/en-route/LISEZ-MOI.md` : le fichier privé `en-route-config.php` se place au-dessus de `www`.
+La bibliothèque réutilise la même base et les comptes existants. Importe une fois le fichier local **`projets/bibliotheque/schema.sql`**, puis transfère les fichiers à jour. Open Library fournit la recherche et les couvertures, sans nouvelle clé. Voir `projets/bibliotheque/LISEZ-MOI.md`.
 
 ## Première installation de la connexion
 
-Suis **`auth/LISEZ-MOI.md`** : importe `auth/schema.sql` dans la même base que Tempo, puis crée le propriétaire avec **id = 1** pour conserver ses séances existantes. Le fichier privé `tempo-config.php` est réutilisé automatiquement. La page `login.php` précède désormais le hub et les deux projets. Les comptes suivants ont chacun leurs propres données.
+Suis **`auth/LISEZ-MOI.md`** : importe `auth/schema.sql` dans la même base que Tempo, puis crée le propriétaire avec **id = 1** pour conserver ses séances existantes. Le fichier privé `tempo-config.php` est réutilisé automatiquement. La page `login.php` précède désormais le hub et les trois projets. Les comptes suivants ont chacun leurs propres données.
 
 ## Transférer le site
 
@@ -29,7 +30,7 @@ Ouvre `projets.js` avec un éditeur de texte. Chaque entrée définit un carnet 
 - `description` : texte secondaire.
 - `icon` : `sparkles`, `braces`, `orbit`, `plus`, `waves`, `ellipsis`, `dumbbell` ou `ticket`.
 - `url` : `null` pour un emplacement à venir ; un chemin relatif (`./projets/mon-outil/`) ou une adresse HTTPS pour ouvrir un projet dans le même onglet.
-- `cover` : `'tempo'` applique la couverture graphite et menthe avec calendrier et haltère ; `'en-route'` applique les tons lin et café. Sans cette propriété, le carnet classique est conservé.
+- `cover` : `'tempo'` applique la couverture graphite et menthe avec calendrier et haltère ; `'en-route'` applique les tons lin et café ; `'bibliotheque'` applique les tons bordeaux et laiton. Sans cette propriété, le carnet classique est conservé.
 
 Tu peux ajouter ou retirer des entrées : la grille se réorganise automatiquement. Respecte les virgules entre les entrées. Aucun numéro de dossier n’est à renseigner : il est calculé automatiquement.
 
@@ -38,7 +39,7 @@ Tu peux ajouter ou retirer des entrées : la grille se réorganise automatiqueme
 - Les textes d’introduction sont dans `index.html`.
 - La disposition et les couleurs sont dans `styles.css`.
 - Les valeurs `BACKGROUND_OPACITY = 0.15` et `OPENING = 0.9` au début de `app.js` reprennent les réglages choisis.
-- Les polices et les images sont dans `assets` : le site ne dépend d’aucun service externe.
+- Les polices et les images du hub sont dans `assets`. Les projets transports et bibliothèque utilisent leurs services externes respectifs.
 
 ## Tester localement
 

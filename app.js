@@ -34,7 +34,8 @@
   if (url) item.href = url; else item.type = 'button';
   const tempoCover = project.cover === 'tempo';
   const transitCover = project.cover === 'en-route';
-  item.className = 'project' + (tempoCover ? ' tempo-project' : '') + (transitCover ? ' transit-project' : '');
+  const libraryCover = project.cover === 'bibliotheque';
+  item.className = 'project' + (tempoCover ? ' tempo-project' : '') + (transitCover ? ' transit-project' : '') + (libraryCover ? ' library-project' : '');
   item.setAttribute('aria-label', (url ? 'Ouvrir ' : 'Découvrir ') + project.title);
   const preview = document.createElement('span');
   preview.className = 'folder-preview';
@@ -45,7 +46,8 @@
   }).join('') + '</span>' : '';
   const innerPage = tempoCover ? '<span class="tempo-page-calendar">' + Array.from({ length: 42 }, (_, cell) => '<i class="' + ([0,2,4].includes(cell % 7) ? 'sport' : '') + '"></i>').join('') + '</span>' : '';
   const transitArt = '<span class="transit-cover-kicker">Carnet de trajets</span><span class="transit-ticket"><span class="transit-ticket-kicker">Un aller simple</span><span class="transit-ticket-title">Entre<br>deux rames</span><span class="transit-ticket-city">Paris · Métro</span></span><span class="transit-cover-footer">02 — Transport</span>';
-  const coverArt = tempoCover ? calendar + '<span class="tempo-haltere">' + icon('dumbbell') + '</span>' : transitCover ? transitArt : '<span class="object-icon">' + icon(project.icon) + '</span><span class="object-number">' + String(i+1).padStart(2,'0') + '</span>';
+  const libraryArt = '<span class="library-cover-title">Ma<br>bibliothèque</span><span class="library-cover-books"><i></i><i></i><i></i></span><span class="library-cover-shelf"></span>';
+  const coverArt = tempoCover ? calendar + '<span class="tempo-haltere">' + icon('dumbbell') + '</span>' : transitCover ? transitArt : libraryCover ? libraryArt : '<span class="object-icon">' + icon(project.icon) + '</span><span class="object-number">' + String(i+1).padStart(2,'0') + '</span>';
   preview.innerHTML = '<span class="folder-shadow"></span><span class="folder-object" style="--angle:' + [-5,5,-3,3,-7,2][i % 6] + 'deg"><span class="book-back"></span><span class="book-pages"></span><span class="book-page">' + innerPage + '</span><span class="book-ribbon"></span><span class="book-cover"><span class="book-cover-edge"></span><span class="book-cover-bottom"></span>' + coverArt + '</span></span>';
   const caption = document.createElement('span');
   caption.className = 'folder-caption';

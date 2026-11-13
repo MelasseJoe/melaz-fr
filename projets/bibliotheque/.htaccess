@@ -1,0 +1,10 @@
+DirectoryIndex index.php
+Options -Indexes
+<IfModule mod_mime.c>
+    AddType application/javascript .mjs
+</IfModule>
+<FilesMatch "^(lib\.php|schema\.sql|LISEZ-MOI\.md)$">
+    Require all denied
+</FilesMatch>
+RewriteEngine On
+RewriteRule ^(?:index\.html)?$ index.php [L]

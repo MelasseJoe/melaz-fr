@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#542838">
+  <meta name="description" content="Ma bibliothèque personnelle : les livres que j’ai lus, leurs couvertures et ce que j’en garde.">
+  <title>Ma bibliothèque — Melaz</title>
+  <link rel="icon" href="../../assets/favicon.jpg" type="image/jpeg">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="../../assets/pwa/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Melaz">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="stylesheet" href="../../assets/pwa.css?v=20261102-1">
+  <script defer src="../../assets/pwa.js?v=20261102-1"></script>
+  <link rel="stylesheet" href="../../assets/fonts.css">
+  <link rel="stylesheet" href="../../assets/auth/session.css?v=20261018-auth-1">
+  <script defer src="../../assets/auth/session.js?v=20261102-remember-1"></script>
+  <link rel="stylesheet" href="styles.css?v=20261112-editions-2">
+  <script type="module" src="app.mjs?v=20261113-scroll-1"></script>
+</head>
+<body class="library-page">
+  <div id="bibliotheque">
+    <div class="cl-stage">
+      <main class="cl-app">
+        <header class="cl-header">
+          <a class="cl-hub" href="../../"><span aria-hidden="true">←</span> Retour au hub</a>
+          <div class="cl-header-tools"><nav data-hub-account aria-label="Mon compte"></nav><button type="button" class="cl-add" disabled><span aria-hidden="true">+</span> Ajouter un livre</button></div>
+        </header>
+        <div class="cl-content" aria-busy="true"><div class="cl-intro"><h1>Ma bibliothèque</h1></div><p class="cl-loading" role="status">Ouverture de ta bibliothèque…</p></div>
+        <footer class="cl-footer"><a href="https://openlibrary.org/" target="_blank" rel="noopener noreferrer">Livres et couvertures : Open Library</a></footer>
+      </main>
+    </div>
+    <div class="cl-toast" role="status" hidden><span></span><button type="button" class="cl-undo" hidden>Annuler</button><button class="cl-dismiss" type="button" aria-label="Fermer la notification">×</button></div>
+    <dialog class="cl-remove-dialog" aria-labelledby="remove-title" aria-describedby="remove-description">
+      <h2 id="remove-title">Retirer ce livre ?</h2><p id="remove-description"></p>
+      <div class="cl-dialog-actions"><button type="button" class="cl-cancel">Conserver le livre</button><button type="button" class="cl-confirm">Retirer de ma bibliothèque</button></div>
+      <p class="cl-dialog-error" role="alert"></p>
+    </dialog>
+    <dialog class="cl-edition-dialog" aria-labelledby="edition-title" aria-describedby="edition-book">
+      <header class="cl-edition-header">
+        <div><h2 id="edition-title">Choisir une édition</h2><p id="edition-book"></p></div>
+        <button type="button" class="cl-edition-close" aria-label="Fermer le choix d’édition">×</button>
+      </header>
+      <p class="cl-edition-status" role="status"></p>
+      <div class="cl-edition-list"></div>
+      <button type="button" class="cl-edition-more cl-primary" hidden>Voir les éditions suivantes</button>
+    </dialog>
+  </div>
+  <noscript><p>Active JavaScript pour consulter ta bibliothèque et ajouter tes livres.</p></noscript>
+</body>
+</html>
