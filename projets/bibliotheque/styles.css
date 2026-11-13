@@ -57,7 +57,7 @@
 #bibliotheque .cl-back,#bibliotheque .cl-quiet{display:inline-flex;align-items:center;justify-content:flex-start;gap:9px;border:0;background:none;padding:10px 0;min-height:44px;color:var(--sub);font-size:14px}
 #bibliotheque .cl-back{margin:36px 0 22px}
 #bibliotheque .cl-quiet{text-decoration:underline;text-underline-offset:5px}
-#bibliotheque .cl-detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:65px;align-items:start;padding:16px 16px 45px}
+#bibliotheque .cl-detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:65px;align-items:start;padding:16px 16px 0}
 #bibliotheque .cl-display{--book-height:380px;display:flex;align-items:center;justify-content:center;min-height:400px;background:radial-gradient(ellipse at 50% 100%,#23081045,transparent 65%)}
 #bibliotheque .cl-display .cl-book{width:min(240px,calc(var(--book-height) * var(--ratio,.675)))}
 #bibliotheque .cl-details h1,#bibliotheque .cl-form-wrap h1{font-size:clamp(30px,4.8cqw,48px);letter-spacing:-1.4px;line-height:1.1;margin:9px 0}
@@ -108,6 +108,50 @@
 @media(max-width:570px){#bibliotheque .cl-toast{left:16px;right:16px;max-width:none}}
 @container clstage (max-width:360px){#bibliotheque .cl-app{--book-height:191px}#bibliotheque .cl-app{padding:18px 21px 28px}#bibliotheque h1{font-size:37px}#bibliotheque .cl-shelf,#bibliotheque .cl-caption-row{gap:24px}}
 @media(prefers-reduced-motion:reduce){#bibliotheque .cl-book{transition:none}#bibliotheque .cl-remove-dialog::backdrop{backdrop-filter:none}}
+
+@container clstage (max-width:650px) {
+  #bibliotheque .cl-header {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+    align-items:center;
+    gap:12px;
+  }
+  #bibliotheque .cl-hub { grid-column:1; grid-row:1; justify-self:start; white-space:nowrap; font-size:11px; gap:4px; }
+  #bibliotheque .cl-header-tools {
+    display:contents;
+  }
+  #bibliotheque .cl-add {
+    grid-column:2;
+    grid-row:1;
+    justify-self:center;
+    font-size:11px;
+    padding:8px 6px;
+    gap:4px;
+  }
+  #bibliotheque .cl-add span { font-size:17px; }
+  #bibliotheque [data-hub-account] {
+    position:relative;
+    grid-column:3;
+    grid-row:1;
+    justify-self:end;
+    width:100%;
+    min-width:0;
+    flex-wrap:nowrap;
+    gap:6px;
+  }
+  #bibliotheque .account-name { min-width:0; max-width:64px; }
+  #bibliotheque .account-logout { flex-shrink:0; min-height:44px; white-space:nowrap; }
+  #bibliotheque .account-notice { position:absolute; top:100%; right:0; width:max-content; max-width:220px; }
+}
+@container clstage (max-width:360px) {
+  #bibliotheque .cl-header,
+  #bibliotheque .cl-header-tools { gap:6px; }
+  #bibliotheque .cl-hub,
+  #bibliotheque .cl-add,
+  #bibliotheque [data-hub-account] { font-size:10px; }
+  #bibliotheque .cl-add { padding-inline:4px; }
+  #bibliotheque [data-hub-account] { gap:4px; }
+}
 
 #bibliotheque .cl-book.has-image .cl-cover-fallback{visibility:hidden}
 
