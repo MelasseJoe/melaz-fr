@@ -24,7 +24,7 @@ import { TempoStore } from './store.mjs?v=20261018-auth-1';
   const config=configs[index];
   const page=document.createElement('div');page.className='fit '+config.cls;page.setAttribute('aria-label',config.name+' — Tempo');section.append(page);page.style.colorScheme=config.theme;Object.entries(config.colors).forEach(([key,value])=>page.style.setProperty('--'+key,value));page.style.setProperty('--bridge','color-mix(in srgb,var(--active) '+config.mix+'%,var(--empty))');
   const body='<div class="week-days" aria-label="Cette semaine"></div>'+yearMarkup();
-  page.innerHTML='<div class="screen-content"><a class="hub-return" href="../../" aria-label="Retour au hub"><span aria-hidden="true">←</span>Hub</a><div class="intro"><div><h1>'+config.title+'</h1></div></div><div class="sync-status" role="status" aria-live="polite"><span>Chargement de tes séances…</span><button type="button" hidden>Réessayer</button></div>'+body+insightsMarkup()+'<span class="message" aria-live="polite"></span></div>';
+  page.innerHTML='<div class="screen-content"><div class="intro"><div><h1>'+config.title+'</h1></div></div><div class="sync-status" role="status" aria-live="polite"><span>Chargement de tes séances…</span><button type="button" hidden>Réessayer</button></div>'+body+insightsMarkup()+'<span class="message" aria-live="polite"></span></div>';
   const canvas=page.querySelector('.heatmap'),ctx=canvas.getContext('2d');
   const probes={};['ink','muted','empty','active','bridge','line','accent-ink','bg'].forEach(token=>{const p=document.createElement('span');p.className='probe';p.style.background='var(--'+token+')';page.append(p);probes[token]=p;});
   page.dataset.marker=config.marker;page.dataset.insight=config.insight;
