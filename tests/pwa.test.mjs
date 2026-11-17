@@ -36,7 +36,7 @@ test('manifest installable et même identité sur toutes les pages', async () =>
   const appleIcon = await fs.readFile(new URL('assets/pwa/apple-touch-icon.png', root));
   assert.equal(appleIcon.readUInt32BE(16), 180); assert.equal(appleIcon.readUInt32BE(20), 180);
   assert.equal(appleIcon[25], 2); // PNG RGB opaque : iOS applique lui-même le masque.
-  for (const file of ['index.html', 'login.php', 'projets/tempo/index.html', 'projets/en-route/index.html', 'projets/bibliotheque/index.html']) {
+  for (const file of ['index.html', 'login.php', 'projets/tempo/index.html', 'projets/en-route/index.html', 'projets/bibliotheque/index.html', 'projets/plateaux/index.html']) {
     const html = await fs.readFile(new URL(file, root), 'utf8');
     assert.match(html, /rel="manifest"/); assert.match(html, /apple-touch-icon/); assert.match(html, /apple-mobile-web-app-title" content="Melaz"/); assert.match(html, /assets\/pwa\.js/);
     assert.match(html, /viewport-fit=cover/);
@@ -53,7 +53,7 @@ test('les pages personnelles sont toujours demandées au réseau sans mise en ca
 });
 test('aucune interception des API, des écritures ou des ressources externes', async () => {
   const w = worker();
-  for (const path of ['auth/api.php?action=me', 'projets/tempo/api.php', 'projets/en-route/api.php?action=departures', 'projets/bibliotheque/api.php']) assert.equal(await w.request(path), null);
+  for (const path of ['auth/api.php?action=me', 'projets/tempo/api.php', 'projets/en-route/api.php?action=departures', 'projets/bibliotheque/api.php', 'projets/plateaux/api.php']) assert.equal(await w.request(path), null);
   assert.equal(await w.request('login.php', { method: 'POST' }), null);
   assert.equal(await w.request('https://external.test/'), null);
   assert.equal(await w.request('assets/auth/session.js', { mode: 'cors' }), null);

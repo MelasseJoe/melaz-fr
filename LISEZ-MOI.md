@@ -5,10 +5,11 @@ Tempo nécessite PHP 8.1 minimum et une base MySQL/MariaDB pour sauvegarder les 
 Les étapes OVH Starter sont dans `projets/tempo/LISEZ-MOI.md`.
 Entre deux rames utilise PHP 8.1 et cURL pour les transports ; les préférences personnelles utilisent la base commune. Pour ajouter ta clé PRIM, suis `projets/en-route/LISEZ-MOI.md` : le fichier privé `en-route-config.php` se place au-dessus de `www`.
 La bibliothèque réutilise la même base et les comptes existants. Importe une fois le fichier local **`projets/bibliotheque/schema.sql`**, puis transfère les fichiers à jour. Open Library fournit la recherche et les couvertures, sans nouvelle clé. Voir `projets/bibliotheque/LISEZ-MOI.md`.
+Le quatrième carnet ouvre **À tête reposée**, la todo list vert sauge. Importe une fois **`projets/plateaux/schema.sql`** dans la même base, puis déploie les fichiers à jour. Chaque utilisateur conserve ses propres tâches. Voir `projets/plateaux/LISEZ-MOI.md`.
 
 ## Première installation de la connexion
 
-Suis **`auth/LISEZ-MOI.md`** : importe `auth/schema.sql` dans la même base que Tempo, puis crée le propriétaire avec **id = 1** pour conserver ses séances existantes. Le fichier privé `tempo-config.php` est réutilisé automatiquement. La page `login.php` précède désormais le hub et les trois projets. Les comptes suivants ont chacun leurs propres données.
+Suis **`auth/LISEZ-MOI.md`** : importe `auth/schema.sql` dans la même base que Tempo, puis crée le propriétaire avec **id = 1** pour conserver ses séances existantes. Le fichier privé `tempo-config.php` est réutilisé automatiquement. La page `login.php` précède le hub et ses quatre projets. Les comptes suivants ont chacun leurs propres données.
 
 ## Transférer le site
 

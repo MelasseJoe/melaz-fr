@@ -30,7 +30,7 @@ function database(): \PDO
 function basePath(): string
 {
     $script = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
-    $prefix = preg_replace('~/(?:auth/[^/]+|projets/(?:tempo|en-route|bibliotheque)/[^/]*|(?:index|login)\.(?:php|html))$~', '', $script);
+    $prefix = preg_replace('~/(?:auth/[^/]+|projets/(?:tempo|en-route|bibliotheque|plateaux)/[^/]*|(?:index|login)\.(?:php|html))$~', '', $script);
     return rtrim(is_string($prefix) && $prefix !== $script ? $prefix : '', '/') . '/';
 }
 function nextPath(mixed $value): string
@@ -38,7 +38,7 @@ function nextPath(mixed $value): string
     $base = basePath();
     if (!is_string($value)) return $base;
     $allowed = [$base, $base . 'index.php', $base . 'index.html'];
-    foreach (['tempo', 'en-route', 'bibliotheque'] as $project) foreach (['', 'index.php', 'index.html'] as $file) $allowed[] = $base . 'projets/' . $project . '/' . $file;
+    foreach (['tempo', 'en-route', 'bibliotheque', 'plateaux'] as $project) foreach (['', 'index.php', 'index.html'] as $file) $allowed[] = $base . 'projets/' . $project . '/' . $file;
     return in_array($value, $allowed, true) ? $value : $base;
 }
 function startSession(): void

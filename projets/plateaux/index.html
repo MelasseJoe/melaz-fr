@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e5eee3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1d2c1c" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="À tête reposée : mes tâches, trois priorités et un peu de place dans la tête.">
+  <title>À tête reposée — Melaz</title>
+  <link rel="icon" href="../../assets/favicon.jpg" type="image/jpeg">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="../../assets/pwa/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Melaz">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="stylesheet" href="../../assets/pwa.css?v=20261102-1">
+  <script defer src="../../assets/pwa.js?v=20261102-1"></script>
+  <link rel="stylesheet" href="../../assets/fonts.css">
+  <link rel="stylesheet" href="../../assets/auth/session.css?v=20261113-alignment-1">
+  <script defer src="../../assets/auth/session.js?v=20261102-remember-1"></script>
+  <link rel="preload" href="assets/instrument-serif.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261117-7">
+  <script type="module" src="app.mjs?v=20261117-7"></script>
+</head>
+<body class="plateaux-page">
+  <div id="plateaux" class="p-app">
+    <header class="p-header">
+      <a class="p-hub" href="../../"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg#arrow-left"></use></svg> Hub</a>
+      <nav data-hub-account aria-label="Mon compte"></nav>
+    </header>
+    <main class="p-main" aria-busy="true">
+      <div class="p-heading"><h1>À tête reposée</h1><span class="p-open" aria-live="polite"></span></div>
+      <form class="p-composer" autocomplete="off">
+        <input name="task" aria-label="Nouvelle tâche" placeholder="Ajouter une tâche…" maxlength="160" enterkeyhint="done" required disabled>
+        <button type="button" class="p-priority-picker p-compose-priority" data-compose-menu title="Priorité haute — modifier" aria-label="Priorité de la nouvelle tâche : haute" aria-haspopup="dialog" aria-controls="task-actions" aria-expanded="false" disabled>
+          <span class="p-priority-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#rocket"></use></svg></span>
+        </button>
+        <input type="hidden" name="priority" value="high">
+        <button class="p-add" type="submit" aria-label="Ajouter la tâche" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg#plus"></use></svg></button>
+      </form>
+      <div class="p-groups">
+        <section class="p-group" data-priority="high" aria-labelledby="priority-high"><div class="p-group-head"><span class="p-dot" aria-hidden="true"></span><h2 id="priority-high">Priorité haute</h2><span class="p-count" data-count="high">0</span></div><div data-list="high"></div><span class="p-empty" hidden>Un peu de place ici.</span></section>
+        <section class="p-group" data-priority="normal" aria-labelledby="priority-normal"><div class="p-group-head"><span class="p-dot" aria-hidden="true"></span><h2 id="priority-normal">Priorité normale</h2><span class="p-count" data-count="normal">0</span></div><div data-list="normal"></div><span class="p-empty" hidden>Un peu de place ici.</span></section>
+        <section class="p-group" data-priority="low" aria-labelledby="priority-low"><div class="p-group-head"><span class="p-dot" aria-hidden="true"></span><h2 id="priority-low">Priorité basse</h2><span class="p-count" data-count="low">0</span></div><div data-list="low"></div><span class="p-empty" hidden>Un peu de place ici.</span></section>
+      </div>
+      <div class="p-end">
+        <details class="p-done"><summary>Terminées <span data-done-count>0</span></summary><div class="p-done-list"></div></details>
+        <div class="p-progress"><span class="p-track" aria-hidden="true"><span class="p-fill"></span></span><span data-progress>0 / 0 terminée</span></div>
+      </div>
+      <div class="p-feedback"><span class="p-message" role="status" aria-live="polite">Ouverture de tes tâches…</span><div class="p-feedback-actions"><button class="p-retry" type="button" hidden>Réessayer</button></div></div>
+    </main>
+  </div>
+  <noscript><p>Active JavaScript pour retrouver et organiser tes tâches.</p></noscript>
+</body>
+</html>

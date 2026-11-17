@@ -75,6 +75,9 @@ $revoked = $tokens->issue($secondUser, $now); $db->exec('UPDATE hub_users SET au
 check($tokens->recover($revoked['value'], $accounts, $now + 1) === null, 'changement de mot de passe/version révoque les jetons persistants');
 $_SERVER['SCRIPT_NAME']='/auth/api.php';
 check(HubAuth\nextPath('/projets/bibliotheque/') === '/projets/bibliotheque/', 'retour à la bibliothèque après connexion autorisé');
+check(HubAuth\nextPath('/projets/plateaux/') === '/projets/plateaux/', 'retour aux Plateaux après connexion autorisé');
+$_SERVER['SCRIPT_NAME']='/sous-dossier/projets/plateaux/index.php';
+check(HubAuth\basePath() === '/sous-dossier/' && HubAuth\nextPath('/sous-dossier/projets/plateaux/') === '/sous-dossier/projets/plateaux/', 'Plateaux protégés aussi dans un sous-dossier');
 $_SERVER['SCRIPT_NAME']='/sous-dossier/projets/bibliotheque/index.php';
 check(HubAuth\basePath() === '/sous-dossier/' && HubAuth\nextPath('/sous-dossier/projets/bibliotheque/') === '/sous-dossier/projets/bibliotheque/', 'bibliothèque protégée aussi dans un sous-dossier');
 $_SERVER['SCRIPT_NAME']='/auth/api.php';

@@ -314,6 +314,21 @@ body {margin:0;}
 @media(prefers-reduced-motion:reduce){#hub-galerie .folder-object {transform:rotateX(-13deg) rotateY(-23deg) rotateZ(var(--angle));}#hub-galerie .project:hover .folder-object,#hub-galerie .project:focus-visible .folder-object {transform:rotateX(-13deg) rotateY(-23deg) rotateZ(var(--angle));}}
 
 /* Carnet Tempo : graphite et menthe, calendrier gravé et haltère. */
+@font-face{font-family:'Instrument Serif Cover';src:url('projets/plateaux/assets/instrument-serif.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap;}
+#hub-galerie .plateaux-project {--folder-edge:light-dark(#536d48,#293e26);--folder-back:light-dark(#6e8460,#3b5037);--folder-front:light-dark(#a5b897,#6f8562);--folder-light:light-dark(#c1ceb3,#91a57f);--sheet:light-dark(#fffbed,#d4d8bc);--rule:light-dark(#c7c7ab,#8c977a);--cover-print:light-dark(#304a29,#172b14);--cover-shadow:light-dark(#29391d42,#0007);}
+#hub-galerie .plateaux-project .book-ribbon {background:var(--folder-edge);}
+#hub-galerie .plateaux-project .book-cover {border-radius:3px 7px 7px 3px;transform:translateZ(9px) rotateY(-12deg);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--sheet) 50%,transparent),inset -1px -1px 1px color-mix(in srgb,var(--folder-edge) 50%,transparent),2px 0 0 var(--folder-back),2px 2px 0 var(--folder-edge),0 3px 0 var(--folder-edge);}
+#hub-galerie [data-folder=notebook] .plateaux-project:hover .book-cover,#hub-galerie [data-folder=notebook] .plateaux-project:focus-visible .book-cover {transform:translateZ(9px) rotateY(calc(-12deg - 60deg * var(--opening)));}
+#hub-galerie .plateaux-cover-title {position:absolute;bottom:13px;left:14px;right:9px;color:var(--cover-print);font:400 11.5px/1.08 'Instrument Serif Cover',serif;letter-spacing:-.15px;text-shadow:0 1px 0 color-mix(in srgb,var(--sheet) 45%,transparent);}
+#hub-galerie .plateaux-cover-window {position:absolute;left:15px;right:12px;top:14px;height:58px;border-radius:4px;background:var(--folder-edge);box-shadow:inset 2px 3px 4px var(--cover-shadow),0 1px 0 var(--sheet),-1px -1px 0 var(--folder-back);overflow:hidden;}
+#hub-galerie .plateaux-cover-window i {display:block;position:absolute;left:7px;right:7px;top:12px;height:20px;background:var(--sheet);border-radius:1px 3px 2px 2px;box-shadow:0 2px 0 var(--folder-back),0 3px 4px var(--cover-shadow);}
+#hub-galerie .plateaux-cover-window i:before {content:'';position:absolute;top:-3px;left:0;width:45%;height:5px;border-radius:2px 3px 0 0;background:inherit;}
+#hub-galerie .plateaux-cover-window i:nth-child(2) {top:25px;left:9px;background:var(--folder-light);}
+#hub-galerie .plateaux-cover-window i:nth-child(3) {top:38px;left:12px;background:var(--folder-front);}
+#hub-galerie .plateaux-project .book-page:after {display:none;}
+#hub-galerie .plateaux-page-list {position:absolute;inset:18px 10px;display:flex;flex-direction:column;gap:15px;}
+#hub-galerie .plateaux-page-list i {position:relative;display:block;height:1px;margin-left:12px;background:var(--rule);}
+#hub-galerie .plateaux-page-list i:before {content:'';position:absolute;left:-12px;top:-3px;width:5px;height:5px;border:1px solid var(--folder-edge);border-radius:50%;}
 #hub-galerie .library-project {--folder-edge:#3b1b29;--folder-back:#452231;--folder-front:#542838;--folder-light:#6d3b4c;--sheet:#f8eddc;--rule:#bba68e;}
 #hub-galerie .library-project .book-ribbon {background:#c4a56a;}
 #hub-galerie .library-project .book-cover {box-shadow:inset 0 1px 0 #faecda28,inset 0 0 0 5px #542838,inset 0 0 0 6px #c9a86b70,2px 0 0 var(--folder-edge),0 2px 0 var(--folder-edge);}

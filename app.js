@@ -11,6 +11,7 @@
  page.style.setProperty('--bg-opacity', BACKGROUND_OPACITY);
  page.style.setProperty('--opening', OPENING);
  const paths = {
+  'list-checks': '<path d="m3 6 2 2 4-4m3 3h9M3 13l2 2 4-4m3 3h9M3 20l2 2 4-4m3 3h9"/>',
   ticket: '<path d="M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4V5Z"/><path d="M15 5v2m0 3v2m0 3v4M7 9h4m-4 5h4"/>',
   dumbbell: '<path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829Z"/><path d="m2.5 21.5 1.4-1.4m16.2-16.2 1.4-1.4M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829Zm4.257-7.085 4.8-4.8"/>',
   sparkles: '<path d="m12 3 2.8 6.2L21 12l-6.2 2.8L12 21l-2.8-6.2L3 12l6.2-2.8Z"/><path d="M20 2v4M18 4h4"/>',
@@ -35,7 +36,8 @@
   const tempoCover = project.cover === 'tempo';
   const transitCover = project.cover === 'en-route';
   const libraryCover = project.cover === 'bibliotheque';
-  item.className = 'project' + (tempoCover ? ' tempo-project' : '') + (transitCover ? ' transit-project' : '') + (libraryCover ? ' library-project' : '');
+  const tasksCover = project.cover === 'plateaux';
+  item.className = 'project' + (tempoCover ? ' tempo-project' : '') + (transitCover ? ' transit-project' : '') + (libraryCover ? ' library-project' : '') + (tasksCover ? ' plateaux-project' : '');
   item.setAttribute('aria-label', (url ? 'Ouvrir ' : 'Découvrir ') + project.title);
   const preview = document.createElement('span');
   preview.className = 'folder-preview';
@@ -44,10 +46,11 @@
    const row = Math.floor(cell / 11), column = cell % 11;
    return '<i class="' + ([0,2,4].includes(row) && (column + row) % 5 !== 0 ? 'sport' : 'pause') + '"></i>';
   }).join('') + '</span>' : '';
-  const innerPage = tempoCover ? '<span class="tempo-page-calendar">' + Array.from({ length: 42 }, (_, cell) => '<i class="' + ([0,2,4].includes(cell % 7) ? 'sport' : '') + '"></i>').join('') + '</span>' : '';
+  const innerPage = tempoCover ? '<span class="tempo-page-calendar">' + Array.from({ length: 42 }, (_, cell) => '<i class="' + ([0,2,4].includes(cell % 7) ? 'sport' : '') + '"></i>').join('') + '</span>' : tasksCover ? '<span class="plateaux-page-list"><i></i><i></i><i></i></span>' : '';
   const transitArt = '<span class="transit-cover-kicker">Carnet de trajets</span><span class="transit-ticket"><span class="transit-ticket-kicker">Un aller simple</span><span class="transit-ticket-title">Entre<br>deux rames</span><span class="transit-ticket-city">Paris · Métro</span></span><span class="transit-cover-footer">02 — Transport</span>';
   const libraryArt = '<span class="library-cover-title">Ma<br>bibliothèque</span><span class="library-cover-books"><i></i><i></i><i></i></span><span class="library-cover-shelf"></span>';
-  const coverArt = tempoCover ? calendar + '<span class="tempo-haltere">' + icon('dumbbell') + '</span>' : transitCover ? transitArt : libraryCover ? libraryArt : '<span class="object-icon">' + icon(project.icon) + '</span><span class="object-number">' + String(i+1).padStart(2,'0') + '</span>';
+  const tasksArt = '<span class="plateaux-cover-window"><i></i><i></i><i></i></span><span class="plateaux-cover-title">À tête reposée</span>';
+  const coverArt = tempoCover ? calendar + '<span class="tempo-haltere">' + icon('dumbbell') + '</span>' : transitCover ? transitArt : libraryCover ? libraryArt : tasksCover ? tasksArt : '<span class="object-icon">' + icon(project.icon) + '</span><span class="object-number">' + String(i+1).padStart(2,'0') + '</span>';
   preview.innerHTML = '<span class="folder-shadow"></span><span class="folder-object" style="--angle:' + [-5,5,-3,3,-7,2][i % 6] + 'deg"><span class="book-back"></span><span class="book-pages"></span><span class="book-page">' + innerPage + '</span><span class="book-ribbon"></span><span class="book-cover"><span class="book-cover-edge"></span><span class="book-cover-bottom"></span>' + coverArt + '</span></span>';
   const caption = document.createElement('span');
   caption.className = 'folder-caption';
