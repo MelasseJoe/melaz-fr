@@ -32,10 +32,17 @@
 #bibliotheque .cl-book{display:block;position:relative;width:min(166px,calc(var(--book-height) * var(--ratio,.675)));max-width:100%;aspect-ratio:var(--ratio,.675);border-radius:1px 3px 3px 1px;isolation:isolate;box-shadow:7px 4px 11px var(--book-shadow),13px 8px 22px #23081036;transition:transform .25s ease}
 #bibliotheque .cl-book:before{content:'';position:absolute;top:3px;bottom:2px;right:-5px;width:6px;background:repeating-linear-gradient(0deg,#ede9df 0px,#ede9df 1px,#d5d0c8 1px,#d5d0c8 2px);z-index:-1;border-radius:0 3px 3px 0}
 #bibliotheque .cl-book:after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,#0003,transparent 3%,#fff2 5%,#0002 7%,transparent 11%,transparent 97%,#0001);pointer-events:none;z-index:3}
-#bibliotheque .cl-book-button:hover .cl-book,#bibliotheque .cl-book-button:focus-visible .cl-book{transform:translateY(-6px)}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  #bibliotheque .cl-book-button:hover .cl-book{transform:translateY(-6px)}
+}
+#bibliotheque .cl-book.cl-cover-flight{
+  position:fixed;z-index:9;max-width:none;margin:0;transform-origin:top left;
+  transition:none;pointer-events:none;
+}
+#bibliotheque .cl-cover-in-flight{visibility:hidden}
 #bibliotheque .cl-book-image{z-index:1;position:absolute;inset:0;width:100%;height:100%;border-radius:inherit;display:block;opacity:0}
 #bibliotheque .cl-book-image.is-loaded{opacity:1}
-#bibliotheque .cl-cover-fallback{z-index:0;position:absolute;inset:0;overflow:hidden;padding:15% 12% 12% 15%;display:flex;flex-direction:column;text-align:left;border-radius:inherit;background:var(--paper,#f1e8db);color:var(--print,#325c69);container-type:inline-size}
+#bibliotheque .cl-cover-fallback{z-index:0;position:absolute;inset:0;overflow:hidden;padding:15% 12% 12% 15%;display:flex;flex-direction:column;text-align:left;border-radius:inherit;background:var(--paper,#f1e8db) url('assets/paper-grain.png?v=2') 0 0/48px 48px;color:var(--print,#325c69);container-type:inline-size}
 #bibliotheque .cl-fallback-author{font-size:clamp(11px,8cqw,16px);line-height:1.15;z-index:1;margin-bottom:10%;overflow-wrap:anywhere}
 #bibliotheque .cl-fallback-title{font:500 clamp(16px,20cqw,36px)/1.02 'Playfair Display',serif;letter-spacing:-.5px;z-index:1;overflow-wrap:anywhere}
 #bibliotheque .cl-cover-fallback:after{content:'';position:absolute;width:63%;height:32%;left:22%;bottom:13%;border:1px solid currentColor;opacity:.45;transform:rotate(-8deg)}

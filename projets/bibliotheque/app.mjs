@@ -2,6 +2,9 @@ import {escapeHTML as e, coverURL, bookRows, dateLabel, parisToday, validDate, m
 
 const root = document.getElementById('bibliotheque');
 const content = root.querySelector('.cl-content');
+const gallery = document.createElement('div');
+gallery.hidden = true;
+content.before(gallery);
 const addButton = root.querySelector('.cl-add');
 const dialog = root.querySelector('.cl-remove-dialog');
 const editionDialog = root.querySelector('.cl-edition-dialog');
@@ -11,6 +14,75 @@ let results = [], lastQuery = '', searchController = null, searchGeneration = 0,
 let editionSession = null;
 let pendingEdition = null;
 let detailDraft = null;
+let galleryAnchor = null;
+let galleryDirty = true;
+let coverAnimation = null;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+function inViewport(rect) {
+  return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
+}
+
+// Copie les pixels déjà affichés pour que la transition ne charge aucune image.
+function coverPreview(cover) {
+  const image = cover.querySelector('img.is-loaded, canvas.cl-cover-preview');
+  if (!image) return null;
+  const width = image.naturalWidth || image.width;
+  const height = image.naturalHeight || image.height;
+  if (!width || !height) return null;
+  const preview = document.createElement('canvas');
+  preview.className = 'cl-book-image is-loaded cl-cover-preview';
+  preview.setAttribute('aria-hidden', 'true');
+  const scale = Math.min(1, 760 / Math.max(width, height));
+  preview.width = Math.max(1, Math.round(width * scale));
+  preview.height = Math.max(1, Math.round(height * scale));
+  const context = preview.getContext('2d');
+  if (!context) return null;
+  context.drawImage(image, 0, 0, preview.width, preview.height);
+  return preview;
+}
+
+function captureCover(cover, event) {
+  if (reducedMotion.matches || !event.detail || !cover?.animate) return null;
+  const rect = cover.getBoundingClientRect();
+  if (!inViewport(rect)) return null;
+
+  const copy = cover.cloneNode(false);
+  copy.append(cover.querySelector('.cl-cover-fallback').cloneNode(true));
+  const preview = coverPreview(cover);
+  if (preview) copy.append(preview);
+  else copy.classList.remove('has-image');
+  return {copy, rect};
+}
+
+function moveCover(snapshot, target, duration) {
+  if (!snapshot || !target) return;
+  const {copy, rect: from} = snapshot;
+  const to = target.getBoundingClientRect();
+  if (!inViewport(to)) return;
+
+  copy.classList.add('cl-cover-flight');
+  copy.setAttribute('aria-hidden', 'true');
+  Object.assign(copy.style, {
+    left: from.left + 'px',
+    top: from.top + 'px',
+    width: from.width + 'px',
+    height: from.height + 'px'
+  });
+  root.append(copy);
+  target.classList.add('cl-cover-in-flight');
+  const animation = copy.animate([
+    {transform: 'none'},
+    {transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`}
+  ], {duration, easing: 'cubic-bezier(.77, 0, .175, 1)', fill: 'forwards'});
+  coverAnimation = animation;
+  const cleanup = () => {
+    copy.remove();
+    target.classList.remove('cl-cover-in-flight');
+    if (coverAnimation === animation) coverAnimation = null;
+  };
+  animation.finished.then(cleanup, cleanup);
+}
 
 function columns() { return root.querySelector('.cl-stage').getBoundingClientRect().width <= 570 ? 2 : 4; }
 async function request(action, data, signal) {
@@ -39,26 +111,32 @@ function bookCover(book, size = 'M') {
   const [paper, print] = fallbackColors(book.title);
   const image = coverURL(book, size);
   const retina = image && size === 'M' ? ` srcset="${e(image)} 1x, ${e(coverURL(book,'L'))} 2x"` : '';
-  return `<span class="cl-book" style="--paper:${paper};--print:${print}"><span class="cl-cover-fallback" aria-hidden="true"><span class="cl-fallback-author">${e(book.author)}</span><span class="cl-fallback-title">${e(book.title)}</span></span>${image ? `<img class="cl-book-image" src="${e(image)}"${retina} alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ''}</span>`;
+  return `<span class="cl-book" style="--paper:${paper};--print:${print}"><span class="cl-cover-fallback" aria-hidden="true"><span class="cl-fallback-author">${e(book.author)}</span><span class="cl-fallback-title">${e(book.title)}</span></span>${image ? `<img class="cl-book-image" src="${e(image)}"${retina} alt="" loading="${size === 'L' ? 'eager' : 'lazy'}" decoding="async" referrerpolicy="no-referrer">` : ''}</span>`;
 }
 function wireImages(target = content) {
-  target.querySelectorAll('.cl-book-image').forEach(image => {
+  target.querySelectorAll('img.cl-book-image').forEach(image => {
     const loaded = () => {
       if (image.naturalWidth < 2 || image.naturalHeight < 2) { image.remove(); return; }
-      image.parentElement.style.setProperty('--ratio', String(image.naturalWidth / image.naturalHeight));
-      image.parentElement.classList.add('has-image');
+      const cover = image.parentElement;
+      cover.style.setProperty('--ratio', String(image.naturalWidth / image.naturalHeight));
+      cover.classList.add('has-image');
       image.classList.add('is-loaded');
+      cover.querySelector('.cl-cover-preview')?.remove();
     };
     image.addEventListener('load', loaded, {once:true});
     image.addEventListener('error', () => image.remove(), {once:true});
     if (image.complete && image.naturalWidth) loaded();
   });
 }
-function headingFocus() { const title = content.querySelector('h1'); if (title) { title.tabIndex = -1; title.focus({preventScroll:true}); } }
+function headingFocus() {
+  const title = (gallery.hidden ? content : gallery).querySelector('h1');
+  if (title) { title.tabIndex = -1; title.focus({preventScroll:true}); }
+}
 function backMarkup(label = 'Tous mes livres') { return `<button class="cl-back" type="button"><span aria-hidden="true">←</span> ${label}</button>`; }
 function cancelSearch() { searchGeneration++; searchController?.abort(); searchController = null; }
 function setView(next, focus = true) {
   if (busy) return;
+  coverAnimation?.cancel();
   if (next !== 'search') cancelSearch();
   view = next; render(); if (focus) headingFocus();
   // La fiche remplace la galerie dans le même document : ne pas garder son défilement.
@@ -66,25 +144,88 @@ function setView(next, focus = true) {
 }
 function showToast(message, undo = false) { toast.hidden = false; toast.querySelector('span').textContent = message; toast.querySelector('.cl-undo').hidden = !undo; }
 toast.querySelector('.cl-dismiss').onclick = () => { toast.hidden = true; };
-function updateBook(book) { const index = books.findIndex(b => b.id === book.id); if (index >= 0) books[index] = book; else books.push(book); }
+function updateBook(book) {
+  const index = books.findIndex(b => b.id === book.id);
+  if (index >= 0) books[index] = book;
+  else books.push(book);
+  galleryDirty = true;
+}
 function galleryRows() {
-  const collection = content.querySelector('.cl-collection'); if (!collection) return;
-  const focusedId = document.activeElement?.dataset?.book;
-  collection.innerHTML = bookRows(books, columns()).map(row => `<div class="cl-shelf-group"><div class="cl-shelf">${row.map(book => `<div class="cl-item"><button class="cl-book-button" type="button" data-book="${book.id}" aria-label="Ouvrir ${e(book.title)}, ${e(book.author)}, terminé le ${e(dateLabel(book.date))}">${bookCover(book)}</button></div>`).join('')}</div><div class="cl-plank" aria-hidden="true"></div><div class="cl-caption-row">${row.map(book => `<time class="cl-date" datetime="${book.date}">${e(dateLabel(book.date))}</time>`).join('')}</div></div>`).join('');
-  collection.querySelectorAll('[data-book]').forEach(button => button.onclick = () => {
-    selectedId = button.dataset.book;
-    pendingEdition = null;
-    detailDraft = null;
-    setView('detail');
-  });
-  wireImages(collection);
-  if (focusedId) collection.querySelector(`[data-book="${focusedId}"]`)?.focus({preventScroll:true});
+  const collection = gallery.querySelector('.cl-collection');
+  const focused = document.activeElement;
+  const existing = new Map([...collection.querySelectorAll('[data-book]')].map(button => [button.dataset.book, button]));
+  const shelves = document.createDocumentFragment();
+
+  for (const row of bookRows(books, columns())) {
+    const group = document.createElement('div');
+    group.className = 'cl-shelf-group';
+    group.innerHTML = '<div class="cl-shelf"></div><div class="cl-plank" aria-hidden="true"></div><div class="cl-caption-row"></div>';
+    const shelf = group.querySelector('.cl-shelf');
+    const captions = group.querySelector('.cl-caption-row');
+    for (const book of row) {
+      const button = existing.get(book.id) || document.createElement('button');
+      button.type = 'button';
+      button.className = 'cl-book-button';
+      button.dataset.book = book.id;
+      const date = dateLabel(book.date);
+      button.setAttribute('aria-label', `Ouvrir ${book.title}, ${book.author}, terminé le ${date}`);
+      const coverKey = JSON.stringify([coverURL(book), book.title, book.author]);
+      if (button.dataset.coverKey !== coverKey) {
+        button.dataset.coverKey = coverKey;
+        button.innerHTML = bookCover(book);
+        wireImages(button);
+      }
+      const item = button.parentElement || document.createElement('div');
+      item.className = 'cl-item';
+      if (!button.parentElement) item.append(button);
+      shelf.append(item);
+
+      const time = document.createElement('time');
+      time.className = 'cl-date';
+      time.dateTime = book.date;
+      time.textContent = date;
+      captions.append(time);
+    }
+    shelves.append(group);
+  }
+  collection.replaceChildren(shelves);
+  const count = books.length;
+  gallery.querySelector('.cl-count').textContent = `${count} ${count === 1 ? 'livre lu' : 'livres lus'}`;
+  gallery.querySelector('.cl-empty').hidden = count > 0;
+  galleryDirty = false;
+  if (collection.contains(focused)) focused.focus({preventScroll:true});
 }
 function renderGallery() {
-  content.innerHTML = `<div class="cl-intro"><h1>Ma bibliothèque</h1><span class="cl-count">${books.length} ${books.length === 1 ? 'livre lu' : 'livres lus'}</span></div>${books.length ? '<div class="cl-collection"></div>' : '<section class="cl-empty"><h2>Ton premier livre a sa place ici.</h2><p>Ajoute un livre que tu as terminé pour commencer ta bibliothèque.</p><button class="cl-primary" type="button" data-first>Ajouter mon premier livre</button></section>'}`;
-  content.querySelector('[data-first]')?.addEventListener('click', startAdd);
-  galleryRows();
+  if (!gallery.firstChild) {
+    gallery.innerHTML = '<div class="cl-intro"><h1>Ma bibliothèque</h1><span class="cl-count"></span></div><div class="cl-collection"></div><section class="cl-empty" hidden><h2>Ton premier livre a sa place ici.</h2><p>Ajoute un livre que tu as terminé pour commencer ta bibliothèque.</p><button class="cl-primary" type="button" data-first>Ajouter mon premier livre</button></section>';
+    gallery.querySelector('[data-first]').addEventListener('click', startAdd);
+  }
+  content.hidden = true;
+  content.replaceChildren();
+  gallery.hidden = false;
+  if (galleryDirty) galleryRows();
 }
+
+gallery.addEventListener('click', event => {
+  const button = event.target.closest('[data-book]');
+  if (!button || busy || !ready) return;
+  const cover = button.querySelector('.cl-book');
+  const snapshot = captureCover(cover, event);
+  const preview = coverPreview(cover);
+  galleryAnchor = {id:button.dataset.book, top:button.getBoundingClientRect().top, scrollY:window.scrollY};
+  selectedId = button.dataset.book;
+  pendingEdition = null;
+  detailDraft = null;
+  setView('detail');
+
+  const destination = content.querySelector('.cl-display .cl-book');
+  if (preview && destination && !destination.classList.contains('has-image')) {
+    destination.style.setProperty('--ratio', cover.style.getPropertyValue('--ratio'));
+    destination.classList.add('has-image');
+    destination.prepend(preview);
+  }
+  moveCover(snapshot, destination, 270);
+});
 function formStatus(message, alert = false) { const target = content.querySelector('.cl-form-status'); if (target) { target.textContent = message; target.setAttribute('role', alert ? 'alert' : 'status'); } }
 function fieldValues() { return {date:content.querySelector('[name="date"]').value,note:content.querySelector('[name="note"]').value.trim()}; }
 function validateFields(form) { if (!form.reportValidity()) return false; if (!validDate(form.elements.date.value, today)) { formStatus('Choisis une date de fin existante, au plus tard aujourd’hui.', true); return false; } return true; }
@@ -284,12 +425,28 @@ editionDialog.querySelector('.cl-edition-more').onclick = () => {
 
 function render() {
   addButton.hidden = ['search','add'].includes(view);
-  if (view === 'gallery') renderGallery(); else if (view === 'detail') renderDetail(); else if (view === 'search') renderSearch(); else renderAdd();
-  content.querySelector('.cl-back')?.addEventListener('click', () => {
+  if (view === 'gallery') { renderGallery(); return; }
+  gallery.hidden = true;
+  content.hidden = false;
+  if (view === 'detail') renderDetail(); else if (view === 'search') renderSearch(); else renderAdd();
+  content.querySelector('.cl-back')?.addEventListener('click', event => {
     if (busy) return;
     if (view === 'add') { setView('search'); return; }
-    setView('gallery');
-    if (selectedId) content.querySelector(`[data-book="${selectedId}"]`)?.focus({preventScroll:true});
+    const anchor = view === 'detail' ? galleryAnchor : null;
+    const snapshot = anchor ? captureCover(content.querySelector('.cl-display .cl-book'), event) : null;
+    galleryAnchor = null;
+    setView('gallery', !anchor);
+    if (!anchor) return;
+
+    const book = gallery.querySelector(`[data-book="${CSS.escape(anchor.id)}"]`);
+    const position = book ? window.scrollY + book.getBoundingClientRect().top - anchor.top : anchor.scrollY;
+    window.scrollTo({top:position, left:0, behavior:'instant'});
+    if (book) {
+      book.focus({preventScroll:true});
+      moveCover(snapshot, book.querySelector('.cl-book'), 210);
+    } else {
+      headingFocus();
+    }
   });
 }
 addButton.onclick = startAdd;
@@ -299,7 +456,7 @@ dialog.querySelector('.cl-confirm').onclick = async () => {
   const book = books.find(b => b.id === selectedId); if (busy || !book) return;
   busy = true; dialog.querySelectorAll('button').forEach(button => button.disabled = true);
   try {
-    const reply = await request('delete',{id:book.id,revision:book.revision}); removed = reply.book; books = books.filter(b => b.id !== book.id); dialog.close(); busy = false; setView('gallery'); showToast('Livre retiré de ta bibliothèque.',true);
+    const reply = await request('delete',{id:book.id,revision:book.revision}); removed = reply.book; books = books.filter(b => b.id !== book.id); galleryDirty = true; dialog.close(); busy = false; setView('gallery'); showToast('Livre retiré de ta bibliothèque.',true);
   } catch (error) { dialog.querySelector('.cl-dialog-error').textContent = error.message; }
   finally { busy = false; dialog.querySelectorAll('button').forEach(button => button.disabled = false); }
 };
@@ -310,12 +467,18 @@ toast.querySelector('.cl-undo').onclick = async () => {
   catch (error) { toast.querySelector('span').textContent = error.message; }
   finally { busy = false; button.disabled = false; addButton.disabled = !ready; }
 };
-new ResizeObserver(() => { const count = columns(); if (count !== columnCount) { columnCount = count; if (ready && view === 'gallery') galleryRows(); } }).observe(root.querySelector('.cl-stage'));
+new ResizeObserver(() => {
+  const count = columns();
+  if (count === columnCount) return;
+  columnCount = count;
+  galleryDirty = true;
+  if (ready && view === 'gallery') galleryRows();
+}).observe(root.querySelector('.cl-stage'));
 async function load() {
   if (busy) return;
   ready = false; addButton.disabled = true; content.setAttribute('aria-busy','true'); cancelSearch();
-  try { await window.HubSession.ready; const reply = await request('list'); books = reply.books; today = reply.today; ready = true; view = 'gallery'; render(); }
-  catch (error) { content.innerHTML = `<div class="cl-intro"><h1>Ma bibliothèque</h1></div><div class="cl-notice" role="alert"><p>${e(error.message)}</p><button class="cl-primary" type="button">Réessayer</button></div>`; content.querySelector('.cl-notice button').onclick = () => load(); }
+  try { await window.HubSession.ready; const reply = await request('list'); books = reply.books; galleryDirty = true; today = reply.today; ready = true; view = 'gallery'; render(); }
+  catch (error) { gallery.hidden = true; content.hidden = false; content.innerHTML = `<div class="cl-intro"><h1>Ma bibliothèque</h1></div><div class="cl-notice" role="alert"><p>${e(error.message)}</p><button class="cl-primary" type="button">Réessayer</button></div>`; content.querySelector('.cl-notice button').onclick = () => load(); }
   finally { content.setAttribute('aria-busy','false'); addButton.disabled = !ready; }
 }
 await load();
