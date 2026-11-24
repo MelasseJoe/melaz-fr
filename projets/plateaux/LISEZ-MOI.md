@@ -1,31 +1,23 @@
-# À tête reposée — Vert sauge
+# À tête reposée — Sommaire vert sauge
 
-Le quatrième carnet du hub ouvre `projets/plateaux/`. Il reprend la maquette validée : dossiers en cascade sur ordinateur, superposés et espacés de 46 px sur mobile, contrastes sauge, onglets clairs et couches de papier. Les titres des dossiers restent écrits. Les sélecteurs utilisent les pictogrammes fusée, avion en papier et escargot, sans flèche visible.
-Le carnet du hub reprend la proposition **Fenêtre sur les priorités** : couverture sauge épaisse, fenêtre en creux avec trois dossiers superposés, titre en bas et pages visibles en perspective. Son ouverture conserve l’animation des carnets du hub.
+Le quatrième carnet du hub ouvre `projets/plateaux/`. L’écran **Mes listes** présente les listes personnelles et la vue **Toutes les tâches**. Dans chaque liste, les tâches à faire s’affichent de la priorité haute à la basse.
 
 ## Déployer sur OVH Starter
 
-1. Dans phpMyAdmin, sélectionne **la base existante du hub**, qui contient déjà `hub_users`.
-2. Importe une seule fois le fichier local **`projets/plateaux/schema.sql`**. Il ajoute uniquement `todo_tasks`, sans modifier les tables et données des autres projets.
-3. Transfère le contenu à jour de **`hub-projet`**, en conservant le fichier caché `.htaccess`. Il faut aussi mettre à jour `auth/lib.php`, qui protège le nouveau projet, et les fichiers du hub.
-4. Ouvre **À tête reposée**, le quatrième carnet. Les comptes existants sont immédiatement utilisables et commencent avec une liste vide.
+1. Dans phpMyAdmin, sélectionne la base existante du hub, qui contient `hub_users`.
+2. Pour une première installation, importe d’abord `projets/plateaux/schema.sql` pour créer la table des tâches. Si le carnet est déjà installé, passe directement à l’étape suivante.
+3. Si la base ne contient pas encore les listes, importe `projets/plateaux/migration-listes.sql` avant de transférer les fichiers. La migration ajoute la table des listes et un rattachement facultatif aux tâches. Les tâches sans liste apparaissent automatiquement dans **Rappels**, avec leur titre, leur priorité et leur état. Les tâches terminées se retrouvent dans **Terminées**. La migration peut être relancée si l’import s’interrompt.
+4. Transfère les fichiers à jour de `hub-projet/projets/plateaux/` en gardant les deux fichiers SQL en local, puis ouvre le carnet avec un compte existant.
 
-Aucun nouvel identifiant, aucune nouvelle clé et aucune compilation. PHP 8.1 minimum et PDO MySQL/MariaDB, comme le hub existant. La configuration privée située au-dessus de `www` reste réutilisée par `HubAuth\database()`.
-
-Le SQL reste local, exclu de GitHub par les règles existantes. Il sert uniquement à l’import manuel et ne doit pas être déposé dans le répertoire public. Aucun import n’a été exécuté sur OVH.
+Le carnet utilise PHP 8.1 minimum et PDO MySQL/MariaDB. La configuration privée au-dessus de `www` et la connexion commune du hub sont réutilisées.
 
 ## Utilisation et sauvegarde
 
-- Saisis une tâche, choisis sa priorité en cliquant sur le pictogramme puis valide avec le bouton + ou Entrée. Le titre accepte jusqu’à 160 caractères.
-- Coche une tâche pour la déplacer dans **Terminées**. Décoche-la pour la retrouver dans son dossier.
-- Clique sur son pictogramme pour ouvrir le choix des trois priorités. Le même menu propose **Supprimer la tâche**, séparé des priorités. La suppression est sauvegardée sans proposer d’annulation. Le dossier, le pictogramme et les compteurs suivent la modification.
-- Les actions sont enregistrées sans bouton d’annulation ni message de confirmation. Les erreurs de sauvegarde restent affichées.
-- Les tâches sont relues à l’ouverture, au retour sur la page et lors d’un changement dans un autre onglet du même navigateur. Une connexion internet est nécessaire pour sauvegarder.
+- **Nouvelle liste** crée une liste privée dans le sommaire. Une tâche ajoutée depuis une liste y est enregistrée. Depuis **Toutes les tâches**, tu peux choisir sa liste à la création.
+- Pour renommer une liste, y compris la liste par défaut **Rappels**, touche le crayon à droite de son titre. Modifie le titre sur place et valide avec la coche ou Entrée. Touche en dehors du titre et de ses boutons pour abandonner la saisie.
+- Les pictogrammes fusée, avion en papier et escargot indiquent les priorités haute, normale et basse. Ils figurent aussi dans le formulaire d’ajout. Touche le pictogramme d’une tâche pour modifier sa priorité ou la supprimer.
+- Coche une tâche pour la retrouver dans **Terminées**. Décoche-la depuis cette section pour la remettre parmi les tâches à faire.
+- Les listes et tâches sont sauvegardées en ligne et restent accessibles sur les autres appareils connectés au même compte. Elles ne sont pas mises en cache par la PWA.
+- La sauvegarde vérifie la version des tâches pour éviter d’écraser une modification effectuée sur un autre appareil. Après une coupure, réessayer un ajout réutilise son identifiant.
 
-Toutes les requêtes utilisent la session connectée. L’identifiant utilisateur envoyé par un client est ignoré. Les écritures contrôlent le jeton CSRF, valident le contenu et vérifient la version de la tâche pour éviter qu’un appareil écrase une modification plus récente. Un nouvel essai d’ajout après une coupure réutilise le même identifiant. Les erreurs restent affichées et la saisie est conservée.
-
-Les données des tâches ne sont stockées ni dans `localStorage` ni dans le cache de la PWA. Les changements s’affichent immédiatement, puis sont sauvegardés en arrière-plan sans rechargement de la page. Les lignes et pictogrammes inchangés restent en place, sans atténuation globale des contrôles. Les erreurs restent visibles et la liste est réconciliée avec le serveur si nécessaire. Les états de chargement utilisent un espace réservé, sans déplacer les dossiers pendant une sauvegarde.
-
-## Ressources
-
-Les polices Instrument Sans et Instrument Serif sont hébergées dans `assets`, avec leurs licences SIL Open Font License. Les sept icônes sont issues de Lucide Static 0.468.0, avec leur licence ISC, et sont aussi servies localement. Aucun service tiers n’est appelé pour afficher ou sauvegarder les tâches.
+Les polices Instrument Sans et Instrument Serif et les icônes Lucide Static sont servies depuis `assets`, avec leurs licences.

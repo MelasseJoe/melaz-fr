@@ -17,15 +17,17 @@ try {
     $action = $_GET['action'] ?? ($method === 'GET' ? 'list' : '');
     if (!is_string($action)) throw new Plateaux\TaskError('Action inconnue.', 404, 'not_found');
     $tasks = new Plateaux\Tasks(HubAuth\database());
-    if ($method === 'GET' && $action === 'list') respond(200, ['tasks' => $tasks->all($user['id'])]);
+    if ($method === 'GET' && $action === 'list') respond(200, ['tasks' => $tasks->all($user['id'])] + $tasks->listCatalog($user['id']));
     if ($method === 'POST') {
-        if (!in_array($action, ['create', 'update', 'delete'], true)) throw new Plateaux\TaskError('Action inconnue.', 404, 'not_found');
+        if (!in_array($action, ['create', 'update', 'delete', 'create_list', 'rename_list'], true)) throw new Plateaux\TaskError('Action inconnue.', 404, 'not_found');
         if (!str_starts_with(strtolower($_SERVER['CONTENT_TYPE'] ?? ''), 'application/json')) throw new Plateaux\TaskError('Le contenu doit être du JSON.', 415, 'invalid_input');
         $raw = file_get_contents('php://input', false, null, 0, 4097);
         if ($raw === false || strlen($raw) > 4096) throw new Plateaux\TaskError('La requête est trop volumineuse.', 413, 'invalid_input');
         try { $input = json_decode($raw, true, 8, JSON_THROW_ON_ERROR); }
         catch (JsonException) { throw new Plateaux\TaskError('Le JSON est invalide.', 400, 'invalid_input'); }
-        if (!is_array($input) || array_is_list($input)) throw new Plateaux\TaskError('Cette tâche est invalide.', 422, 'invalid_input');
+        if (!is_array($input) || array_is_list($input)) throw new Plateaux\TaskError('Cette requête est invalide.', 422, 'invalid_input');
+        if ($action === 'create_list') respond(201, ['list' => $tasks->createList($user['id'], $input)]);
+        if ($action === 'rename_list') respond(200, ['list' => $tasks->renameList($user['id'], $input)]);
         $task = match ($action) {
             'create' => $tasks->create($user['id'], $input),
             'update' => $tasks->update($user['id'], $input),
@@ -39,6 +41,9 @@ try {
     respond($error->status, ['error' => $error->getMessage(), 'code' => $error instanceof Plateaux\TaskError ? $error->kind : 'forbidden']);
 } catch (Throwable $error) {
     error_log('Plateaux: ' . get_class($error));
-    $missing = $error instanceof PDOException && in_array((string) $error->getCode(), ['42S02', 'HY000'], true) && str_contains($error->getMessage(), 'todo_tasks');
+    $missing = $error instanceof PDOException && (
+        (in_array((string) $error->getCode(), ['42S02', 'HY000'], true) && preg_match('/todo_tasks|todo_lists|list_id/', $error->getMessage()))
+        || ((string) $error->getCode() === '42S22' && str_contains($error->getMessage(), 'list_id'))
+    );
     respond(503, ['error' => $missing ? 'Les tâches ne sont pas encore disponibles. Le propriétaire doit terminer l’installation.' : 'Les tâches sont momentanément indisponibles. Réessaie dans un instant.', 'code' => $missing ? 'setup_required' : 'unavailable']);
 }

@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#e5eee3" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1d2c1c" media="(prefers-color-scheme: dark)">
-  <meta name="description" content="À tête reposée : mes tâches, trois priorités et un peu de place dans la tête.">
+  <meta name="description" content="À tête reposée : mes listes et mes tâches classées par priorité.">
   <title>À tête reposée — Melaz</title>
   <link rel="icon" href="../../assets/favicon.jpg" type="image/jpeg">
   <link rel="manifest" href="../../manifest.webmanifest">
@@ -20,8 +20,8 @@
   <link rel="stylesheet" href="../../assets/auth/session.css?v=20261113-alignment-1">
   <script defer src="../../assets/auth/session.js?v=20261102-remember-1"></script>
   <link rel="preload" href="assets/instrument-serif.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=20261117-7">
-  <script type="module" src="app.mjs?v=20261117-7"></script>
+  <link rel="stylesheet" href="styles.css?v=20261124-titre-editable-2">
+  <script type="module" src="app.mjs?v=20261124-titre-editable-2"></script>
 </head>
 <body class="plateaux-page">
   <div id="plateaux" class="p-app">
@@ -30,26 +30,96 @@
       <nav data-hub-account aria-label="Mon compte"></nav>
     </header>
     <main class="p-main" aria-busy="true">
-      <div class="p-heading"><h1>À tête reposée</h1><span class="p-open" aria-live="polite"></span></div>
-      <form class="p-composer" autocomplete="off">
-        <input name="task" aria-label="Nouvelle tâche" placeholder="Ajouter une tâche…" maxlength="160" enterkeyhint="done" required disabled>
-        <button type="button" class="p-priority-picker p-compose-priority" data-compose-menu title="Priorité haute — modifier" aria-label="Priorité de la nouvelle tâche : haute" aria-haspopup="dialog" aria-controls="task-actions" aria-expanded="false" disabled>
-          <span class="p-priority-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#rocket"></use></svg></span>
+      <section class="p-home" data-home aria-labelledby="p-home-title">
+        <header class="p-home-heading">
+          <p>À tête reposée</p>
+          <h1 id="p-home-title">Mes listes</h1>
+        </header>
+        <nav class="p-index" data-index aria-label="Mes listes"></nav>
+        <button class="p-secondary p-new-list" type="button" data-new-list aria-expanded="false" aria-controls="p-list-form" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg#plus"></use></svg>
+          Nouvelle liste
         </button>
-        <input type="hidden" name="priority" value="high">
-        <button class="p-add" type="submit" aria-label="Ajouter la tâche" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg#plus"></use></svg></button>
-      </form>
-      <div class="p-groups">
-        <section class="p-group" data-priority="high" aria-labelledby="priority-high"><div class="p-group-head"><span class="p-dot" aria-hidden="true"></span><h2 id="priority-high">Priorité haute</h2><span class="p-count" data-count="high">0</span></div><div data-list="high"></div><span class="p-empty" hidden>Un peu de place ici.</span></section>
-        <section class="p-group" data-priority="normal" aria-labelledby="priority-normal"><div class="p-group-head"><span class="p-dot" aria-hidden="true"></span><h2 id="priority-normal">Priorité normale</h2><span class="p-count" data-count="normal">0</span></div><div data-list="normal"></div><span class="p-empty" hidden>Un peu de place ici.</span></section>
-        <section class="p-group" data-priority="low" aria-labelledby="priority-low"><div class="p-group-head"><span class="p-dot" aria-hidden="true"></span><h2 id="priority-low">Priorité basse</h2><span class="p-count" data-count="low">0</span></div><div data-list="low"></div><span class="p-empty" hidden>Un peu de place ici.</span></section>
-      </div>
-      <div class="p-end">
-        <details class="p-done"><summary>Terminées <span data-done-count>0</span></summary><div class="p-done-list"></div></details>
-        <div class="p-progress"><span class="p-track" aria-hidden="true"><span class="p-fill"></span></span><span data-progress>0 / 0 terminée</span></div>
-      </div>
-      <div class="p-feedback"><span class="p-message" role="status" aria-live="polite">Ouverture de tes tâches…</span><div class="p-feedback-actions"><button class="p-retry" type="button" hidden>Réessayer</button></div></div>
+        <form class="p-form" id="p-list-form" autocomplete="off" hidden>
+          <input id="p-list-entry" type="text" aria-label="Nouvelle liste" placeholder="Ex. Vacances" maxlength="42" autocomplete="off" enterkeyhint="done" required>
+          <div class="p-form-actions">
+            <button class="p-primary" type="submit">Créer</button>
+            <button class="p-secondary" type="button" data-cancel-list>Annuler</button>
+          </div>
+        </form>
+        <div data-home-feedback>
+          <div class="p-feedback" data-feedback>
+            <p class="p-message" role="status">Ouverture de tes tâches…</p>
+            <button class="p-secondary" type="button" data-retry hidden>Réessayer</button>
+          </div>
+        </div>
+      </section>
+
+      <section data-list-page aria-labelledby="p-list-title" hidden>
+        <button class="p-secondary p-back" type="button" data-back>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg#arrow-left"></use></svg>
+          Mes listes
+        </button>
+        <header class="p-list-heading">
+          <h1 id="p-list-title">Rappels</h1>
+          <form class="p-rename-inline" id="p-rename-form" autocomplete="off" hidden>
+            <input id="p-rename-entry" type="text" aria-label="Renommer la liste" maxlength="42" autocomplete="off" enterkeyhint="done" required>
+          </form>
+          <button class="p-secondary p-rename" type="button" data-rename aria-label="Renommer la liste" aria-expanded="false" aria-controls="p-rename-form" hidden>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg?v=20261124-renommer-1#pencil"></use></svg>
+          </button>
+          <button class="p-primary p-rename-save" type="submit" form="p-rename-form" data-save-rename aria-label="Enregistrer le nom" hidden>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg#check"></use></svg>
+          </button>
+          <p data-open-count aria-live="polite"></p>
+          <button class="p-primary p-new-task" type="button" data-new-task aria-label="Ajouter une tâche" aria-expanded="false" aria-controls="p-task-form">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg#plus"></use></svg>
+          </button>
+        </header>
+        <form class="p-form" id="p-task-form" autocomplete="off" hidden>
+          <input id="p-task-entry" name="task" aria-label="Nouvelle tâche" placeholder="Ajouter une tâche…" maxlength="160" autocomplete="off" enterkeyhint="done" required>
+          <label class="p-destination" data-destination hidden>Liste
+            <select name="list"></select>
+          </label>
+          <div data-compose-priority></div>
+          <div class="p-form-actions">
+            <button class="p-primary" type="submit">Ajouter</button>
+            <button class="p-secondary" type="button" data-cancel-task>Annuler</button>
+          </div>
+        </form>
+        <div data-form-feedback></div>
+
+        <ul class="p-tasks" data-tasks aria-label="Tâches à faire"></ul>
+        <p class="p-empty" data-open-empty hidden>Aucune tâche à faire</p>
+        <details class="p-done">
+          <summary>Terminées <span data-done-count>0</span></summary>
+          <ul class="p-tasks" data-done aria-label="Tâches terminées"></ul>
+          <p class="p-empty" data-done-empty hidden>Aucune tâche terminée</p>
+        </details>
+        <div data-task-feedback></div>
+      </section>
     </main>
+    <template data-row-template>
+      <li class="p-row">
+        <div class="p-row-main">
+          <label class="p-check">
+            <input type="checkbox">
+            <span class="p-check-face" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#check"></use></svg></span>
+            <span class="p-label"><span data-task-title></span><small class="p-origin" hidden></small></span>
+          </label>
+          <button type="button" class="p-priority-picker" data-actions aria-expanded="false"></button>
+        </div>
+      </li>
+    </template>
+    <template data-editor-template>
+      <div class="p-editor">
+        <div data-editor-priority></div>
+        <button class="p-delete" type="button" data-delete>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><use href="assets/icons.svg#trash-2"></use></svg>
+          Supprimer la tâche
+        </button>
+      </div>
+    </template>
   </div>
   <noscript><p>Active JavaScript pour retrouver et organiser tes tâches.</p></noscript>
 </body>
