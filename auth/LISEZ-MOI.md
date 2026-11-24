@@ -1,13 +1,13 @@
 # Connexion au hub et comptes personnels
 
-La page de connexion est `login.php`. Le hub, Tempo et Entre deux rames utilisent une seule session PHP. Aucun formulaire d’inscription n’est prévu : les utilisateurs se créent à la main dans phpMyAdmin.
+La page de connexion est `login.php`. Le lien « Créer un compte » affiche le formulaire d’inscription dans le même carnet. Le pseudo sert d’identifiant et s’affiche en haut à droite après la connexion automatique. Le hub et ses quatre projets partagent la même session PHP. L’inscription utilise les tables existantes.
 
 ## Installation sur OVH Starter
 
 1. Fais une sauvegarde de ta base avant toute intervention.
 2. Dans phpMyAdmin, sélectionne **la base déjà utilisée par Tempo**, puis importe le fichier `auth/schema.sql` du dossier `hub-projet`. Il crée `hub_users`, `hub_user_settings` et `hub_login_attempts`. Il ne supprime ni ne modifie les séances existantes. Il crée `tempo_sport_days` seulement si elle manque.
 3. Le hub réutilise automatiquement le fichier privé `tempo-config.php` déjà placé **au-dessus de `www`**. Aucun nouvel identifiant de base n’est nécessaire. Si tu préfères un fichier séparé, copie `auth/config.example.php` en `hub-config.php` au-dessus de `www`, avec les mêmes paramètres MySQL. `HUB_CONFIG` peut aussi indiquer un chemin absolu. Le même accès à la base est utilisé par Tempo et la connexion.
-4. Crée ton premier utilisateur avec **id = 1**, comme indiqué ci-dessous. Les anciennes séances appartiennent déjà à `user_id = 1` : ne réimporte pas ton historique, ne change pas leurs identifiants.
+4. Si tu réutilises un historique Tempo, crée son propriétaire avec **id = 1** comme indiqué ci-dessous. L’inscription est bloquée si des séances existent pour cet identifiant et que son compte manque. Sur une base vierge, crée le premier compte depuis la page de connexion.
 5. Transfère le **contenu complet** de `hub-projet` dans `www`, y compris les fichiers cachés `.htaccess` des trois pages et du dossier `auth`. Accède au site en **HTTPS**. Vérifie qu’une fenêtre privée qui ouvre `/`, `/index.html`, `/projets/tempo/` ou `/projets/en-route/index.html` arrive à la connexion. Si le serveur signale une erreur 500, vérifie que la réécriture Apache est active et que tous les `.htaccess` ont bien été transférés.
 
 Le serveur charge `index.php` et protège aussi les anciennes adresses `index.html`. Les feuilles HTML restent dans le dossier pour faciliter leur édition ; elles ne doivent pas être servies en contournant les règles `.htaccess`.
@@ -53,7 +53,7 @@ Dans phpMyAdmin, ouvre `hub_users` → **Insérer**, puis renseigne :
 
 Si l’identifiant 1 existe déjà, modifie cette ligne au lieu de l’insérer de nouveau. Ne crée pas de deuxième compte propriétaire en changeant l’identifiant : tu verrais un calendrier vide.
 
-Pour un **autre utilisateur**, insère une nouvelle ligne en laissant `id` vide (AUTO_INCREMENT). Donne-lui son propre identifiant, nom et empreinte. Il commence avec un calendrier et des préférences de transport vides.
+Les autres utilisateurs peuvent créer leur compte depuis la page de connexion. Le pseudo doit être unique indépendamment des majuscules. Chaque nouveau compte commence avec ses propres données.
 
 ## Modifier ou désactiver un compte
 
@@ -66,10 +66,11 @@ Pour un **autre utilisateur**, insère une nouvelle ligne en laissant `id` vide 
 
 - **Tempo** lit et écrit seulement les dates du compte connecté, via l’identifiant contenu dans la session serveur. Un `user_id` envoyé par le navigateur est ignoré.
 - **Entre deux rames** sauvegarde la dernière ligne et le dernier arrêt dans `hub_user_settings`, par compte. Le choix est restauré sur les autres appareils au prochain chargement de la page. Les anciennes préférences locales anonymes ne sont pas attribuées à un nouveau compte.
+- **Bibliothèque** et **À tête reposée** enregistrent respectivement les livres et les tâches par identifiant de compte.
 - Les données publiques PRIM (passages, perturbations, itinéraires) sont partagées ; les choix personnels ne le sont pas. La clé PRIM reste côté serveur dans `en-route-config.php`.
 - Le hub affiche le nom du compte et propose la déconnexion sur chaque page. Les cartes de projet sont communes à tous les comptes.
 - Session en cookie HTTP-only, SameSite=Lax, Secure en HTTPS ; identifiant renouvelé à la connexion, CSRF pour les écritures, expiration de la session courte après 12 h d’inactivité (et 7 jours maximum), puis restauration automatique par le cookie persistant tant que ses 30 jours ne sont pas écoulés.
-- Limitation : 8 tentatives par identifiant/adresse IP et 40 par IP dans une fenêtre de 15 minutes. Les empreintes techniques expirées sont nettoyées ; les mots de passe et adresses IP brutes ne sont pas enregistrés dans cette table.
+- La connexion et l’inscription partagent la limite de 8 tentatives par identifiant et adresse IP, et de 40 par IP dans une fenêtre de 15 minutes. Les empreintes techniques expirées sont nettoyées ; les mots de passe et adresses IP brutes ne sont pas enregistrés dans cette table.
 
 Les fichiers `hub-config.php`, `tempo-config.php`, `en-route-config.php`, les caches et les fichiers SQL sont ignorés par Git. `auth/schema.sql` est un schéma vierge local, distinct de ton import historique personnel. Les accès HTTP aux fichiers SQL et aux configurations sont refusés. Les outils `tools/password-hash.*` restent hors du dossier déployable.
 

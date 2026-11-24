@@ -8,7 +8,7 @@ function reply(int $status, array $data): never { http_response_code($status); e
 try {
     $action = $_GET['action'] ?? 'me';
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    if (!is_string($action) || !in_array($action, ['me', 'login', 'logout', 'settings'], true)) throw new HubAuth\AuthError('Cette action n’existe pas.', 404);
+    if (!is_string($action) || !in_array($action, ['me', 'login', 'register', 'logout', 'settings'], true)) throw new HubAuth\AuthError('Cette action n’existe pas.', 404);
     if (($action === 'me' && $method !== 'GET') || ($action !== 'me' && $method !== 'POST')) { header('Allow: ' . ($action === 'me' ? 'GET' : 'POST')); throw new HubAuth\AuthError('Méthode non autorisée.', 405); }
     HubAuth\startSession();
     if ($action === 'me') {
@@ -23,14 +23,32 @@ try {
     if (!is_string($raw) || strlen($raw) > 4096) throw new HubAuth\AuthError('Requête trop volumineuse.', 413);
     try { $input = json_decode($raw, true, 8, JSON_THROW_ON_ERROR); } catch (JsonException $e) { throw new HubAuth\AuthError('La requête est invalide.', 400); }
     if (!is_array($input)) throw new HubAuth\AuthError('La requête est invalide.', 400);
-    if ($action === 'login') {
-        if (!is_string($input['username'] ?? null) || !is_string($input['password'] ?? null)) throw new HubAuth\AuthError('Renseigne ton identifiant et ton mot de passe.', 422);
-        // Le verrou de session ne reste pas ouvert pendant le calcul du mot de passe.
-        session_write_close();
-        $account = (new HubAuth\Accounts(HubAuth\database()))->authenticate($input['username'], $input['password'], $_SERVER['REMOTE_ADDR'] ?? 'unknown');
-        HubAuth\establish($account);
-        HubAuth\rememberDevice($account, (new HubAuth\Accounts(HubAuth\database()))->tokens());
-        reply(200, ['next' => HubAuth\nextPath($input['next'] ?? null)]);
+    if ($action === 'login' || $action === 'register') {
+        $registering = $action === 'register';
+        $username = $input['username'] ?? null;
+        $password = $input['password'] ?? null;
+        if (!is_string($username) || !is_string($password)) {
+            throw new HubAuth\AuthError($registering ? 'Renseigne ton pseudo et ton mot de passe.' : 'Renseigne ton identifiant et ton mot de passe.', 422);
+        }
+        $accounts = new HubAuth\Accounts(HubAuth\database());
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if ($registering) {
+            if (HubAuth\currentUser($accounts)) throw new HubAuth\AuthError('Tu es déjà connecté. Déconnecte-toi pour créer un autre compte.', 409);
+            $account = $accounts->register($username, $password, $ip);
+        } else {
+            // Le verrou de session ne reste pas ouvert pendant le calcul du mot de passe.
+            session_write_close();
+            $account = $accounts->authenticate($username, $password, $ip);
+        }
+        try {
+            HubAuth\establish($account);
+            HubAuth\rememberDevice($account, $accounts->tokens());
+        } catch (Throwable $error) {
+            if (!$registering) throw $error;
+            error_log('Hub registration session error: ' . get_class($error));
+            throw new HubAuth\AuthError('Ton compte a été créé. Reviens à la connexion pour ouvrir ton espace.');
+        }
+        reply($registering ? 201 : 200, ['next' => HubAuth\nextPath($input['next'] ?? null)]);
     }
     $user = HubAuth\requireUser();
     if ($action === 'logout') {

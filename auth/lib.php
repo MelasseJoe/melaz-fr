@@ -112,6 +112,36 @@ final class Accounts
         }
         unset($row['password_hash']); return $row;
     }
+    public function register(string $pseudo, string $password, string $ip): array
+    {
+        $displayName = trim($pseudo);
+        $username = strtolower($displayName);
+        if (!preg_match('/^[a-z0-9._-]{3,64}$/D', $username)) {
+            throw new AuthError('Choisis un pseudo de 3 à 64 caractères (lettres sans accent, chiffres, point, tiret ou souligné).', 422);
+        }
+        if (strlen($password) < 12 || strlen($password) > 72 || str_contains($password, "\0")) {
+            throw new AuthError('Choisis un mot de passe de 12 à 72 octets. Les caractères accentués peuvent compter pour plusieurs octets.', 422);
+        }
+        $this->consumeAttempt($username, $ip, time());
+
+        // Réserve l’historique Tempo déjà importé au propriétaire qui doit encore être créé.
+        $legacy = $this->db->query('SELECT 1 FROM tempo_sport_days WHERE user_id = 1 AND NOT EXISTS (SELECT 1 FROM hub_users WHERE id = 1) LIMIT 1');
+        if ($legacy->fetchColumn()) {
+            throw new AuthError('La création de compte sera disponible après la configuration du compte propriétaire.');
+        }
+
+        $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+        $query = $this->db->prepare('INSERT INTO hub_users (username, display_name, password_hash) VALUES (?, ?, ?)');
+        try {
+            $query->execute([$username, $displayName, $hash]);
+        } catch (\PDOException $error) {
+            if ($error->getCode() === '23000' && in_array((int) ($error->errorInfo[1] ?? 0), [19, 1062, 2067], true)) {
+                throw new AuthError('Ce pseudo est déjà pris. Choisis-en un autre.', 409);
+            }
+            throw $error;
+        }
+        return ['id' => (int) $this->db->lastInsertId(), 'username' => $username, 'display_name' => $displayName, 'auth_version' => 1];
+    }
     public function settings(int $id): array
     {
         $q = $this->db->prepare('SELECT namespace, settings_json FROM hub_user_settings WHERE user_id = ?'); $q->execute([$id]); $result = [];

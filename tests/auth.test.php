@@ -11,9 +11,31 @@ $db->exec('CREATE TABLE tempo_sport_days (user_id INTEGER, sport_date TEXT, PRIM
 $db->exec('CREATE TABLE hub_remember_tokens (selector TEXT PRIMARY KEY, user_id INTEGER, auth_version INTEGER, validator_hash TEXT, previous_hash TEXT, previous_until INTEGER, expires_at INTEGER)');
 $password = 'Mot-de-passe-de-test-2026';
 $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 4]);
+$accounts = new HubAuth\Accounts($db);
+$db->exec("INSERT INTO tempo_sport_days VALUES (1, '2026-10-12')");
+try {
+    $accounts->register('guest', $password, 'signup-test');
+    check(false, 'historique Tempo orphelin');
+} catch (HubAuth\AuthError $e) {
+    check($e->status === 503 && (int) $db->query('SELECT COUNT(*) FROM hub_users')->fetchColumn() === 0, 'l’inscription préserve le compte propriétaire d’un historique Tempo existant');
+}
 $q = $db->prepare('INSERT INTO hub_users (id,username,display_name,password_hash) VALUES (?,?,?,?)');
 $q->execute([1, 'owner', 'Propriétaire', $hash]); $q->execute([2, 'second', 'Deuxième compte', $hash]);
-$accounts = new HubAuth\Accounts($db);
+$registered = $accounts->register(' Camille ', $password, 'signup-test');
+check($registered['id'] > 2 && $registered['username'] === 'camille' && $registered['display_name'] === 'Camille' && !isset($registered['password_hash']), 'inscription avec un identifiant propre et conservation de la casse du pseudo');
+check((int) $accounts->authenticate('CAMILLE', $password, 'signup-test')['id'] === $registered['id'], 'connexion possible avec les identifiants du nouveau compte');
+try {
+    $accounts->register('CAMILLE', $password, 'signup-test');
+    check(false, 'pseudo en doublon');
+} catch (HubAuth\AuthError $e) {
+    check($e->status === 409, 'un pseudo déjà pris est refusé quelle que soit sa casse');
+}
+try {
+    $accounts->register('other', str_repeat('é', 37), 'signup-test');
+    check(false, 'mot de passe tronqué');
+} catch (HubAuth\AuthError $e) {
+    check($e->status === 422, 'un mot de passe dépassant 72 octets est refusé');
+}
 $user = $accounts->authenticate('OWNER', $password, 'test-a');
 check((int) $user['id'] === 1 && !isset($user['password_hash']), 'identification normalisée sans fuite de l’empreinte');
 check(password_get_info($db->query('SELECT password_hash FROM hub_users WHERE id=1')->fetchColumn())['options']['cost'] === 12, 'renforcement automatique du coût bcrypt');

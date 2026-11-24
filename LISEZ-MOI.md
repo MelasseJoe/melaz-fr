@@ -9,7 +9,7 @@ Le quatrième carnet ouvre **À tête reposée**, la todo list vert sauge. Impor
 
 ## Première installation de la connexion
 
-Suis **`auth/LISEZ-MOI.md`** : importe `auth/schema.sql` dans la même base que Tempo, puis crée le propriétaire avec **id = 1** pour conserver ses séances existantes. Le fichier privé `tempo-config.php` est réutilisé automatiquement. La page `login.php` précède le hub et ses quatre projets. Les comptes suivants ont chacun leurs propres données.
+Importe `auth/schema.sql` dans la même base que Tempo. Si tu as déjà des séances, crée leur propriétaire avec **id = 1** en suivant **`auth/LISEZ-MOI.md`**. Le fichier privé `tempo-config.php` est réutilisé automatiquement. La page `login.php` permet aux utilisateurs de créer un compte et d’ouvrir leur espace personnel dans chacun des quatre projets.
 
 ## Transférer le site
 
